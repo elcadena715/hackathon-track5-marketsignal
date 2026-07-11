@@ -5,8 +5,9 @@ import requests
 from agents.motor import MotorAgentesIA
 from core.database import init_db, guardar_revision, obtener_revisiones
 
-# Inicializar Base de Datos SQLite
+# Inicializar Base de Datos SQLite y Memoria Caché de Señales
 init_db()
+if "senales_cache" not in st.session_state: st.session_state.senales_cache = {}
 
 st.set_page_config(page_title="MarketSignal Guardian | Track 5", layout="wide", page_icon="⚡")
 
@@ -34,8 +35,14 @@ st.sidebar.title("⚡ MarketSignal Guardian")
 st.sidebar.caption("Hackathon Agentic Scale - Track 5")
 st.sidebar.markdown("---")
 
-api_key_gemini = st.sidebar.text_input("🔑 Google Gemini API Key:", value=os.getenv("GEMINI_API_KEY", ""), type="password")
-api_key_news = st.sidebar.text_input("📰 NewsAPI Key (Opcional):", value=os.getenv("NEWS_API_KEY", ""), type="password")
+# --- LECTURA INTELIGENTE DE LLAVES (SECRETS + INPUT) ---
+# Intenta leer primero de los secretos de Streamlit (st.secrets) o de variables de entorno
+gemini_default = st.secrets.get("GEMINI_API_KEY", os.getenv("GEMINI_API_KEY", ""))
+news_default = st.secrets.get("NEWS_API_KEY", os.getenv("NEWS_API_KEY", ""))
+
+# La casilla de texto toma el valor por defecto del servidor, el jurado no necesita tocarla
+api_key_gemini = st.sidebar.text_input("🔑 Google Gemini API Key:", value=gemini_default, type="password")
+api_key_news = st.sidebar.text_input("📰 NewsAPI Key (Opcional):", value=news_default, type="password")
 
 motor = MotorAgentesIA(api_key=api_key_gemini)
 if motor.model:
@@ -94,7 +101,16 @@ with tab1:
         if simbolo_filtro != "Todos" and activo_rel["symbol"] != simbolo_filtro: continue
 
         sid = f"sig_{activo_rel['symbol']}_{i}"
-        senal = motor.procesar_pipeline(noti, activo_rel)
+        
+        # --- CACHÉ INTELIGENTE DE SEÑALES ---
+        # Si la señal no está en memoria, llamamos a la IA (Gemini) y la guardamos
+        if sid not in st.session_state.senales_cache:
+            st.session_state.senales_cache[sid] = motor.procesar_pipeline(noti, activo_rel)
+        
+        # Leemos la señal directamente de la memoria rápida
+        senal = st.session_state.senales_cache[sid]
+        # -------------------------------------
+
         estado_rev = revisiones_db.get(sid, {}).get("status", "⏳ Pendiente de Auditoría")
 
         with st.container():

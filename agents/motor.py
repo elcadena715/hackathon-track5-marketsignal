@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import google.generativeai as genai
 from prompts import SYSTEM_PROMPT_ASESOR
 
@@ -12,33 +13,58 @@ class MotorAgentesIA:
             try:
                 genai.configure(api_key=self.api_key)
                 
-                # --- AUTODETECTOR DE MODELOS (SOLUCIÓN AL ERROR 404) ---
-                # Intentamos conectar primero a los nombres estándar más rápidos
-                nombres_a_probar = ['gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-pro', 'models/gemini-1.5-flash']
+                # --- SELECTOR BLINDADO CON PING DE VALIDACIÓN Y PRIORIDAD GEMINI ---
+                # Priorizamos los nombres estándar más rápidos y estables para finanzas
+                candidatos = [
+                    'gemini-1.5-flash',
+                    'gemini-1.5-flash-latest',
+                    'gemini-flash-latest',
+                    'models/gemini-flash-latest',
+                    'gemini-1.5-pro',
+                    'gemini-pro',
+                    'models/gemini-1.5-flash'
+                ]
                 
-                for nombre in nombres_a_probar:
+                print("⏳ Verificando cerebro IA y probando conexión en vivo...")
+                
+                for nombre in candidatos:
                     try:
-                        self.model = genai.GenerativeModel(nombre)
-                        # Hacemos una mini prueba silenciosa para validar que no dé 404
-                        print(f"🟢 Conectado exitosamente al modelo de Google: {nombre}")
-                        break
+                        modelo_test = genai.GenerativeModel(nombre)
+                        resp_test = modelo_test.generate_content("ping", generation_config=genai.GenerationConfig(max_output_tokens=5))
+                        if resp_test and resp_test.text:
+                            self.model = modelo_test
+                            print(f"🟢 ¡Cerebro IA Conectado y Verificado! Modelo oficial confirmado: {nombre}")
+                            break
                     except Exception:
                         continue
                 
-                # Si ninguno de la lista anterior funcionó, buscamos automáticamente en tu cuenta
+                # Si los nombres estándar fallan, buscamos en el catálogo dando prioridad absoluta a "gemini"
                 if not self.model:
-                    for m in genai.list_models():
-                        if 'generateContent' in m.supported_generation_methods:
-                            self.model = genai.GenerativeModel(m.name)
-                            print(f"🟢 Autodetectado modelo compatible en tu cuenta: {m.name}")
-                            break
+                    modelos_disponibles = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+                    
+                    # Ordenamos para que los que tienen "gemini" y "flash" queden primeros en la fila, dejando "gemma" al final
+                    modelos_ordenados = sorted(modelos_disponibles, key=lambda x: (0 if ('gemini' in x.lower() and 'flash' in x.lower()) else (1 if 'gemini' in x.lower() else 2)))
+                    
+                    for m_name in modelos_ordenados:
+                        try:
+                            modelo_test = genai.GenerativeModel(m_name)
+                            resp_test = modelo_test.generate_content("ping", generation_config=genai.GenerationConfig(max_output_tokens=5))
+                            if resp_test and resp_test.text:
+                                self.model = modelo_test
+                                print(f"🟢 Autodetectado modelo funcional en tu cuenta: {m_name}")
+                                break
+                        except Exception:
+                            continue
+
+                if not self.model:
+                    print("⚠️ Tu API Key es válida pero ningún modelo respondió el ping. Usando respaldo determinista 9.2.")
                             
             except Exception as e:
-                print(f"❌ Error al configurar Gemini: {e}")
+                print(f"❌ Error al configurar Google AI: {e}")
                 self.model = None
 
     def procesar_pipeline(self, noticia, activo):
-        """Ejecuta el pipeline de los 4 agentes con limpieza robusta de JSON."""
+        """Ejecuta el pipeline de los 4 agentes con extracción quirúrgica de JSON mediante Regex."""
         evento_coyuntura = {
             "id": noticia.get("id"),
             "titulo": noticia.get("title"),
@@ -56,7 +82,7 @@ class MotorAgentesIA:
                 - Activo vinculado: {activo['name']} ({activo['symbol']}) - Categoría: {activo['type']}
                 - Precio Actual: {activo['current_price']} | Variación últimos 7 días: {activo['price_move_7d']}%
 
-                Genera la señal explicable en formato estrictamente JSON sin formato markdown extra.
+                Genera la señal explicable en formato estrictamente JSON sin texto introductorio ni markdown.
                 """
                 resp = self.model.generate_content(
                     f"{SYSTEM_PROMPT_ASESOR}\n\n{prompt_usuario}",
@@ -65,9 +91,17 @@ class MotorAgentesIA:
                         temperature=0.2
                     )
                 )
-                texto_limpio = resp.text.replace("```json", "").replace("```", "").strip()
-                senal = json.loads(texto_limpio)
-                print(f"🟢 ¡Éxito en vivo! IA analizó: {evento_coyuntura['titulo'][:30]}...")
+                
+                # --- EXTRACCIÓN QUIRÚRGICA CON REGEX ---
+                # Buscamos exclusivamente el bloque que empieza con { y termina con }, ignorando saludos del LLM
+                match = re.search(r'\{.*\}', resp.text, re.DOTALL)
+                if match:
+                    texto_json = match.group(0)
+                    senal = json.loads(texto_json)
+                    print(f"🟢 ¡Éxito en vivo! IA analizó: {evento_coyuntura['titulo'][:30]}...")
+                else:
+                    raise ValueError("El modelo no retornó una estructura JSON delimitada por llaves.")
+                    
             except Exception as e:
                 print(f"⚠️ Alerta en inferencia ({e}). Pasando al respaldo determinista 9.2.")
                 senal = self._aplicar_formula_matematica(evento_coyuntura, activo)
