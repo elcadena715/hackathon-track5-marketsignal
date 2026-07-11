@@ -35,16 +35,24 @@ st.sidebar.title("⚡ MarketSignal Guardian")
 st.sidebar.caption("Hackathon Agentic Scale - Track 5")
 st.sidebar.markdown("---")
 
-# --- LECTURA INTELIGENTE DE LLAVES (SECRETS + INPUT) ---
-# Intenta leer primero de los secretos de Streamlit (st.secrets) o de variables de entorno
-gemini_default = st.secrets.get("GEMINI_API_KEY", os.getenv("GEMINI_API_KEY", ""))
-news_default = st.secrets.get("NEWS_API_KEY", os.getenv("NEWS_API_KEY", ""))
+# 1. Leemos las llaves silenciosamente desde los secretos de la nube o entorno local
+api_key_gemini = st.secrets.get("GEMINI_API_KEY", os.getenv("GEMINI_API_KEY", ""))
+api_key_news = st.secrets.get("NEWS_API_KEY", os.getenv("NEWS_API_KEY", ""))
 
-# La casilla de texto toma el valor por defecto del servidor, el jurado no necesita tocarla
-api_key_gemini = st.sidebar.text_input("🔑 Google Gemini API Key:", value=gemini_default, type="password")
-api_key_news = st.sidebar.text_input("📰 NewsAPI Key (Opcional):", value=news_default, type="password")
+# 2. INTERFAZ LIMPIA: Solo mostramos las cajas de texto si NO encontró la llave en la nube
+if not api_key_gemini:
+    api_key_gemini = st.sidebar.text_input("🔑 Google Gemini API Key:", value="", type="password")
+if not api_key_news:
+    api_key_news = st.sidebar.text_input("📰 NewsAPI Key (Opcional):", value="", type="password")
 
-motor = MotorAgentesIA(api_key=api_key_gemini)
+# 3. Inicializamos el cerebro con caché para no repetir el ping al hacer clic en botones
+@st.cache_resource
+def obtener_motor(api_key):
+    return MotorAgentesIA(api_key=api_key)
+
+motor = obtener_motor(api_key_gemini)
+
+# 4. Indicador visual limpio para el jurado (Sin mostrar contraseñas)
 if motor.model:
     st.sidebar.success("🟢 Cerebro IA: Gemini 1.5 Flash Activo")
 else:
