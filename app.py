@@ -84,9 +84,9 @@ if api_key_news:
         query_str = " OR ".join([a["symbol"] for a in activos_db])
         url = f"https://newsapi.org/v2/everything?q={query_str}&language=es,en&sortBy=publishedAt&pageSize=6&apiKey={api_key_news}"
         res = requests.get(url, timeout=3).json()
-        st.sidebar.toast(f"API: {len(res.get('articles', []))} noticias nuevas cargadas", icon="📡")
         if res.get("status") == "ok" and res.get("articles"):
             noticias_actuales = res["articles"]
+            st.sidebar.toast(f"API: {len(res.get('articles', []))} noticias nuevas cargadas", icon="📡")
     except Exception:
         pass # Si falla internet, se mantiene noticias_resguardo automáticamente
 
