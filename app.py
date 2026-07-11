@@ -7,6 +7,7 @@ from core.database import init_db, guardar_revision, obtener_revisiones
 
 # Inicializar Base de Datos SQLite y Memoria Caché de Señales
 init_db()
+#prueba commit inicial
 if "senales_cache" not in st.session_state: st.session_state.senales_cache = {}
 
 st.set_page_config(page_title="MarketSignal Guardian | Track 5", layout="wide", page_icon="⚡")
