@@ -84,6 +84,7 @@ if api_key_news:
         query_str = " OR ".join([a["symbol"] for a in activos_db])
         url = f"https://newsapi.org/v2/everything?q={query_str}&language=es,en&sortBy=publishedAt&pageSize=6&apiKey={api_key_news}"
         res = requests.get(url, timeout=3).json()
+        print(f"DEBUG API: Recibí {len(res.get('articles', []))} noticias nuevas de NewsAPI")
         if res.get("status") == "ok" and res.get("articles"):
             noticias_actuales = res["articles"]
     except Exception:
