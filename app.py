@@ -74,7 +74,8 @@ with c_f1:
 with c_f2:
     simbolo_filtro = st.selectbox("2. Filtrar por Activo:", ["Todos"] + [a["symbol"] for a in activos_db])
 with c_f3:
-    if st.button("🚀 Consultar Feeds", use_container_width=True):
+    if st.button("🔄 Refrescar Pipeline de Datos", use_container_width=True):
+        st.toast("Pipeline sincronizado con el repositorio de activos.", icon="✅")
         st.session_state.recargar = True
 
 # Obtener Noticias (NewsAPI o Resguardo JSON)
