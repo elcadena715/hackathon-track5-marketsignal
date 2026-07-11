@@ -1,0 +1,8 @@
+[
+  {"symbol": "BTC", "name": "Bitcoin", "type": "Criptoactivos", "price_move_7d": 4.15, "current_price": "$65,420"},
+  {"symbol": "ETH", "name": "Ethereum", "type": "Criptoactivos", "price_move_7d": -1.20, "current_price": "$3,410"},
+  {"symbol": "NVDA", "name": "NVIDIA Corp", "type": "Renta Variable", "price_move_7d": -3.40, "current_price": "$122.50"},
+  {"symbol": "SPY", "name": "S&P 500 ETF", "type": "Renta Variable", "price_move_7d": 1.10, "current_price": "$552.30"},
+  {"symbol": "BOND10Y", "name": "Bonos Tesoro 10Y", "type": "Instrumentos de crédito", "price_move_7d": 0.05, "current_price": "4.12%"},
+  {"symbol": "OIL", "name": "Petróleo WTI", "type": "Otros activos", "price_move_7d": 2.30, "current_price": "$82.10"}
+]
