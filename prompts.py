@@ -13,7 +13,8 @@ DEBES RESPONDER ÚNICAMENTE EN FORMATO JSON VÁLIDO CON ESTA ESTRUCTURA EXACTA:
 {
     "impacto": "Positivo | Negativo | Neutral | Incierto",
     "confianza": "Alta | Media | Baja",
-    "confianza_score": 0.85,
+    "confianza_score": 0.90,
+    "tipo_grafico":"gauge",
     "explicacion": "Análisis técnico y fundamental contrastando el titular con el movimiento del precio en los últimos 7 días.",
     "accion_investigacion": "Una tarea práctica para el analista humano (Ej: 'Verificar niveles de soporte en RSI' o 'Auditar guía de márgenes').",
     "disclaimer": "Esta señal explicable se genera con fines de análisis e investigación; no constituye asesoría personalizada ni garantiza resultados financieros."
