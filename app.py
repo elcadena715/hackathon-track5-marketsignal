@@ -2,6 +2,7 @@ import streamlit as st
 import json
 import os
 import requests
+from fpdf import FPDF
 from agents.motor import MotorAgentesIA
 from core.database import init_db, guardar_revision, obtener_revisiones
 
@@ -179,6 +180,34 @@ with tab2:
             st.markdown(f"**Revisor Fiduciario:** {datos['reviewer']} | **Fecha:** {datos['date'][:16]}")
             st.success(f"**Justificación de Aprobación:** {datos['justification']}")
             st.divider()
-        if st.button("🖨️ Exportar Briefing para Clientes"):
+        if if st.button("🖨️ Exportar Briefing para Clientes"):
             st.balloons()
-            st.success("Briefing empaquetado y listo para envío institucional sin directrices de compra/venta.")
+            
+            # Crear PDF en memoria
+            pdf = FPDF()
+            pdf.add_page()
+            
+            # Título
+            pdf.set_font("Arial", 'B', 16)
+            pdf.cell(200, 10, txt="MARKETSIGNAL GUARDIAN - BRIEFING EJECUTIVO", ln=True, align='C')
+            pdf.ln(10) # Salto de línea
+            
+            # Contenido
+            pdf.set_font("Arial", size=12)
+            for sid, datos in aprobadas.items():
+                pdf.set_font("Arial", 'B', 12)
+                pdf.cell(200, 10, txt=f"Señal: {sid}", ln=True)
+                pdf.set_font("Arial", size=12)
+                pdf.multi_cell(0, 10, txt=f"Justificación: {datos['justification']}\nFecha: {datos['date']}\n")
+                pdf.ln(5)
+            
+            # Generar el PDF para el botón de descarga
+            pdf_output = pdf.output(dest='S').encode('latin-1')
+            
+            st.download_button(
+                label="📥 Descargar Reporte en PDF",
+                data=pdf_output,
+                file_name="Briefing_Ejecutivo.pdf",
+                mime="application/pdf"
+            )
+            st.success("Briefing generado en formato PDF profesional.")
