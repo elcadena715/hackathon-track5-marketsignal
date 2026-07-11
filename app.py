@@ -180,7 +180,7 @@ with tab2:
             st.markdown(f"**Revisor Fiduciario:** {datos['reviewer']} | **Fecha:** {datos['date'][:16]}")
             st.success(f"**Justificación de Aprobación:** {datos['justification']}")
             st.divider()
-        if if st.button("🖨️ Exportar Briefing para Clientes"):
+        if  st.button("🖨️ Exportar Briefing para Clientes"):
             st.balloons()
             
             # Crear PDF en memoria
