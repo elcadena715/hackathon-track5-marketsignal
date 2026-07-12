@@ -138,7 +138,7 @@ if api_key_news:
 
 if 'active_tab' not in st.session_state:
     st.session_state.active_tab = 0
-tab1, tab2, tab3 = st.tabs(["📊 Monitor de Mercado - A1,A2", "📊 Briefing de Mercado", "📑 Reporte de Compliance - A3"])
+tab1, tab2, tab3 = st.tabs([" Monitor de Mercado", " Briefing de Mercado", "Reporte de Compliance"])
 
 with tab1:
     # --- LÓGICA DE NAVEGACIÓN ---
@@ -230,8 +230,12 @@ with tab1:
                     guardar_revision(sid, "✅ Validada", justificacion)
                     st.success("Guardado.")
                 else: st.error("Se requiere justificación.")
-            b2.button("⚠️ Escalar", key=f"esc_{sid}")
-            b3.button("🗑️ Descartar", key=f"del_{sid}")
+            if b2.button("⚠️ Escalar", key=f"esc_{sid}"):
+                guardar_revision(sid, "⚠️ Escalada", justificacion)
+                st.rerun()
+            if b3.button("🗑️ Descartar", key=f"del_{sid}"):
+                guardar_revision(sid, "🗑️ Descartada", justificacion)
+                st.rerun()
 
 with tab2: 
     st.subheader("📊 Briefing de Mercado")
@@ -279,7 +283,7 @@ with tab2:
                     st.switch_page("app.py")
 
 with tab3:
-    st.subheader("📑 Reporte de Compliance - A4")
+    st.subheader("📑 Reporte de Compliance")
     st.write("Resumen consolidado exclusivo para comités de inversión. **Solo incluye señales marcadas como Aprobadas por analistas humanos**.")
     
     revs = obtener_revisiones()
