@@ -103,14 +103,17 @@ st.info("💡 **Regla del Track 5:** Transforma noticias en señales explicables
 c_cat, c_act, c_ref = st.columns([2, 2, 1])
 
 with c_cat:
-    cat_filtro = st.selectbox("1. Categoría:", ["Todas", "Renta Variable", "Instrumentos de crédito", "Criptoactivos", "Otros activos"])
+    mercados = ["Todos", "Monedas", "Acciones", "Criptoactivos", "ETFs", "Bonos", "Materias Primas"]
+    cat_filtro = st.selectbox("1. Mercados:", mercados)
 
 with c_act:
-    simbolo_filtro = st.selectbox("2. Activo:", ["Todos"] + [a["symbol"] for a in activos_db])
+    activos_disponibles = [a for a in activos_db if cat_filtro == "Todos" or a["type"] == cat_filtro]
+    simbolos = ["Todos"] + [a["symbol"] for a in activos_disponibles]
+    simbolo_filtro = st.selectbox("2. Activo:", simbolos)
 
 with c_ref: 
     st.write("") 
-    if st.button("🔄 Actualizar Noticias", use_container_width=True):
+    if st.button("🔄 Buscar Noticias", use_container_width=True):
         st.toast("Noticias Actualizadas.", icon="✅")
         st.session_state.recargar = True
 
@@ -131,80 +134,80 @@ if api_key_news:
 tab1, tab2 = st.tabs(["📊 Monitor de Mercado - A1,A2", "📑 Reporte de Compliance - A3"])
 
 with tab1:
-    st.subheader("Titulares y Análisis de Impacto")
-    revisiones_db = obtener_revisiones()
-    
-    for i, noti in enumerate(noticias_actuales):
-        # Mapear noticia a un activo del catálogo
-        activo_rel = activos_db[0]
-        for a in activos_db:
-            if a["symbol"] in noti.get("title", "") or a["symbol"] in str(noti.get("related_assets", "")):
-                activo_rel = a
-                break
+    # --- LÓGICA DE NAVEGACIÓN ---
+    if st.session_state.view == 'list':
+        st.subheader("Titulares y Análisis de Impacto")
+        revisiones_db = obtener_revisiones()
         
-        # Filtros de UI
-        if cat_filtro != "Todas" and activo_rel["type"] != cat_filtro: continue
-        if simbolo_filtro != "Todos" and activo_rel["symbol"] != simbolo_filtro: continue
+        for i, noti in enumerate(noticias_actuales):
+            activo_rel = activos_db[0]
+            for a in activos_db:
+                if a["symbol"] in noti.get("title", "") or a["symbol"] in str(noti.get("related_assets", "")):
+                    activo_rel = a
+                    break
+            
+            if cat_filtro != "Todos" and activo_rel["type"] != cat_filtro: continue
+            if simbolo_filtro != "Todos" and activo_rel["symbol"] != simbolo_filtro: continue
 
-        sid = f"sig_{activo_rel['symbol']}_{i}"
+            sid = f"sig_{activo_rel['symbol']}_{i}"
+            
+            with st.container(border=True):
+                st.markdown(f"#### 📰 {noti.get('title')}")
+                st.caption(f"**Activo:** `{activo_rel['name']} ({activo_rel['symbol']})` | **Fuente:** {noti.get('source', {}).get('name', 'N/A')}")
+                
+                if st.button("🔍 Ver Análisis Detallado", key=f"det_{sid}"):
+                    st.session_state.selected_news = (noti, activo_rel, sid)
+                    st.session_state.view = 'detail'
+                    st.rerun()
+
+    # --- FICHA DE AUDITORÍA (DETALLE) ---
+    elif st.session_state.view == 'detail':
+        noti, activo_rel, sid = st.session_state.selected_news
         
-        # --- CACHÉ INTELIGENTE DE SEÑALES ---
-        # Si la señal no está en memoria, llamamos a la IA (Gemini) y la guardamos
+        if st.button("⬅️ Volver al Radar"):
+            st.session_state.view = 'list'
+            st.rerun()
+            
+        # PROCESAMIENTO CON MOTOR
         if sid not in st.session_state.senales_cache:
             st.session_state.senales_cache[sid] = motor.procesar_pipeline(noti, activo_rel)
-        
-        # Leemos la señal directamente de la memoria rápida
         senal = st.session_state.senales_cache[sid]
-        # -------------------------------------
-
-        estado_rev = revisiones_db.get(sid, {}).get("status", "⏳ Pendiente de Auditoría")
-
-        with st.container(border=True):
-            col1, col2 = st.columns([3, 2])
-            
-            # Columna izquierda: Información del activo y noticia
-            with col1:
-                st.markdown(f"#### 📰 {noti.get('title')}")
-                st.caption(f"**Fuente:** {noti.get('source', {}).get('name', 'N/A')} | **Fecha:** {noti.get('publishedAt', '')[:10]} | **Activo:** `{activo_rel['name']} ({activo_rel['symbol']})`")
-                st.caption(f"**ID Auditoría:** `{sid}`") 
-                st.write(noti.get("description", "Sin descripción detallada."))
-            
-            # Columna derecha: Impacto y métricas
-            with col2:
-                imp = senal["impacto"]
-                color = "🟢" if imp == "Positivo" else ("🔴" if imp == "Negativo" else ("⚪" if imp == "Neutral" else "🟡"))
-                st.markdown(f"### {color} Impacto: **{imp.upper()}**")
-                st.caption(f"Confianza IA: **{senal['confianza']}** ({senal.get('confianza_score', 'N/A')}) | Precio 7d: **{activo_rel['price_move_7d']}%**")
-
-            # 1. Expandible de Explicabilidad (Ahora arriba, desplegable)
-            with st.expander("🔍 Ver Explicabilidad y Acción Recomendada"):
-                st.write(f"**Explicación Técnica:** {senal['explicacion']}")
-                st.markdown(f"**⚡ Acción de Investigación:** *{senal['accion_investigacion']}*")
-                st.caption(f"⚠️ *{senal['disclaimer']}*")
-
-            # 2. Expandible de Auditoría (Workflow de Cumplimiento)
-            with st.expander("📝 Crear Auditoría"):
-                st.markdown(f"**Estado de Auditoría:** `{estado_rev}`")
-                justificacion = st.text_area("Justificación técnica obligatoria:", key=f"just_{sid}")
-                
-                # Diseño compacto: Texto y botones en una misma línea
-                c_titulo, c_botones = st.columns([1, 2]) # El título ocupa 1/3, los botones 2/3
-                with c_titulo:
-                    st.markdown("**Decisión fiduciaria:**")
-                
-                with c_botones:
-                    # Usamos un contenedor de botones para que no tengan espacio extra
-                    b1, b2, b3 = st.columns(3)
-                    
-                    if b1.button("✅ Validar", key=f"ok_{sid}"):
-                        if len(justificacion) < 5: 
-                            st.error("Se requiere justificación.")
-                        else:
-                            guardar_revision(sid, "✅ Validada", justificacion)
-                            st.rerun()
-                    b2.button("⚠️ Escalar", key=f"esc_{sid}")
-                    b3.button("🗑️ Descartar", key=f"del_{sid}")
-            st.markdown("</div>", unsafe_allow_html=True)
+        
+        # RENDERIZADO DE FICHA COMPLETA
+        st.title(noti.get('title'))
+        
+        # --- AQUÍ ESTÁ LO QUE FALTABA: IMPACTO Y CONFIANZA ---
+        imp = senal["impacto"]
+        color = "🟢" if imp == "Positivo" else ("🔴" if imp == "Negativo" else ("⚪" if imp == "Neutral" else "🟡"))
+        
+        c_head1, c_head2 = st.columns([2, 1])
+        with c_head1:
+            st.caption(f"{noti.get('source', {}).get('name', 'N/A')} - {noti.get('publishedAt', '')[:10]}")
+        with c_head2:
+            st.markdown(f"### {color} **{imp.upper()}**")
+        
+        st.write(noti.get("description", "Sin descripción detallada."))
+        st.caption(f"Confianza IA: **{senal['confianza']}** ({senal.get('confianza_score', 'N/A')})")
+        
+        st.markdown("---")
+        
+        # Explicabilidad COMPLETA
+        st.subheader("🔍 Explicabilidad y Acción Recomendada")
+        st.info(f"**Explicación:** {senal['explicacion']}")
+        st.write(f"**⚡ Acción:** {senal['accion_investigacion']}")
+        st.caption(f"⚠️ *{senal['disclaimer']}*")
+        
+        # Flujo de Auditoría
+        with st.expander("📝 Crear Auditoría", expanded=True):
+            justificacion = st.text_area("Justificación técnica:", key=f"just_{sid}")
+            b1, b2, b3 = st.columns(3)
+            if b1.button("✅ Validar", key=f"ok_{sid}"):
+                if len(justificacion) > 5:
+                    guardar_revision(sid, "✅ Validada", justificacion)
+                    st.success("Guardado.")
+                else: st.error("Se requiere justificación.")
+            b2.button("⚠️ Escalar", key=f"esc_{sid}")
+            b3.button("🗑️ Descartar", key=f"del_{sid}")
 
 with tab2:
     st.subheader("📑 Reporte de Compliance - A4")

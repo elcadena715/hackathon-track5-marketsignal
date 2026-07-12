@@ -1,32 +1,74 @@
 [
   {
-    "id": "news_1",
+    "id": "n1",
     "title": "La SEC aprueba nuevas directrices para la custodia bancaria de Bitcoin",
     "source": {"name": "Bloomberg News"},
     "publishedAt": "2026-07-11T09:30:00Z",
-    "description": "La comisión permitió a bancos tradicionales mantener criptoactivos en balance bajo menores requisitos de capital prudencial, impulsando la liquidez institucional.",
-    "topic": "regulation",
-    "sector": "digital_assets",
+    "market": "Criptoactivos",
     "related_assets": ["BTC", "ETH"]
   },
   {
-    "id": "news_2",
-    "title": "Reserva Federal insinúa recorte agresivo de tasas de interés para el Q3",
-    "source": {"name": "Wall Street Journal"},
-    "publishedAt": "2026-07-11T08:00:00Z",
-    "description": "El enfriamiento del mercado laboral impulsa a la Fed a considerar una baja de 50 puntos básicos, afectando los rendimientos de renta fija.",
-    "topic": "monetary_policy",
-    "sector": "macro",
-    "related_assets": ["BOND10Y", "SPY"]
+    "id": "n2",
+    "title": "Tesla supera expectativas de entrega en Q2",
+    "source": {"name": "Reuters"},
+    "publishedAt": "2026-07-11T10:00:00Z",
+    "market": "Acciones",
+    "related_assets": ["TSLA"]
   },
   {
-    "id": "news_3",
-    "title": "NVIDIA supera proyecciones de ingresos pero reporta retrasos en chips Blackwell",
+    "id": "n3",
+    "title": "Apple anuncia expansión en servicios de IA generativa",
+    "source": {"name": "Wall Street Journal"},
+    "publishedAt": "2026-07-11T11:00:00Z",
+    "market": "Acciones",
+    "related_assets": ["AAPL", "NVDA"]
+  },
+  {
+    "id": "n4",
+    "title": "Petroecuador reporta incremento histórico en producción",
+    "source": {"name": "El Comercio"},
+    "publishedAt": "2026-07-11T12:00:00Z",
+    "market": "Materias Primas",
+    "related_assets": ["OIL"]
+  },
+  {
+    "id": "n5",
+    "title": "Banco Central baja tasas de interés",
+    "source": {"name": "Bloomberg News"},
+    "publishedAt": "2026-07-11T13:00:00Z",
+    "market": "Bonos",
+    "related_assets": ["BONO_10Y"]
+  },
+  {
+    "id": "n6",
+    "title": "Empresa líder de Oro reporta hallazgo de nuevas reservas",
     "source": {"name": "Reuters"},
-    "publishedAt": "2026-07-10T16:20:00Z",
-    "description": "Un cuello de botella en el suministro de tierras raras retrasará entregas de servidores en un trimestre, generando volatilidad a corto plazo.",
-    "topic": "earnings",
-    "sector": "technology",
-    "related_assets": ["NVDA", "QQQ"]
+    "publishedAt": "2026-07-11T14:00:00Z",
+    "market": "Materias Primas",
+    "related_assets": ["GOLD"]
+  },
+  {
+    "id": "n7",
+    "title": "Retraso en cadena de suministro afecta chips",
+    "source": {"name": "Wall Street Journal"},
+    "publishedAt": "2026-07-11T15:00:00Z",
+    "market": "Acciones",
+    "related_assets": ["NVDA", "INTC"]
+  },
+  {
+    "id": "n8",
+    "title": "Caída en precio de Materias Primas impacta sector minero",
+    "source": {"name": "Bloomberg News"},
+    "publishedAt": "2026-07-11T16:00:00Z",
+    "market": "Materias Primas",
+    "related_assets": ["GOLD", "COPPER"]
+  },
+  {
+    "id": "n9",
+    "title": "Reguladores investigan brecha de seguridad en Exchange",
+    "source": {"name": "Reuters"},
+    "publishedAt": "2026-07-11T17:00:00Z",
+    "market": "Criptoactivos",
+    "related_assets": ["BTC", "SOL"]
   }
 ]
