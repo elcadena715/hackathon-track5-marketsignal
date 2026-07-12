@@ -139,7 +139,8 @@ if api_key_news:
     except Exception:
         pass # Si falla internet, se mantiene noticias_resguardo automáticamente
 
-# PESTAÑAS
+if 'active_tab' not in st.session_state:
+    st.session_state.active_tab = 0
 tab1, tab2, tab3 = st.tabs(["📊 Monitor de Mercado - A1,A2", "📊 Briefing de Mercado", "📑 Reporte de Compliance - A3"])
 
 with tab1:
