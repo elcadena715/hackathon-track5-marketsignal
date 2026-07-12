@@ -182,13 +182,16 @@ with tab1:
                         st.session_state.selected_news = (noti, activo_rel, sid)
                         st.session_state.view = 'detail'
                         st.rerun()
+                        return
 
     # --- FICHA DE AUDITORÍA (DETALLE) ---
     elif st.session_state.view == 'detail':
         noti, activo_rel, sid = st.session_state.selected_news
         
         if st.button("⬅️ Volver al Radar"):
-           st.session_state.view = 'list'
+            st.session_state.view = 'list'
+            st.rerun()
+            return
             
         # PROCESAMIENTO CON MOTOR
         if sid not in st.session_state.senales_cache:
@@ -276,6 +279,7 @@ with tab2:
                     st.session_state.selected_news = (noti, next((a for a in activos_db if a["symbol"] in str(noti.get("related_assets"))), activos_db[0]), f"sig_{noti['id']}")
                     st.session_state.view = 'detail'
                     st.switch_page("app.py")
+                    return
 
 with tab3:
     st.subheader("📑 Reporte de Compliance")
