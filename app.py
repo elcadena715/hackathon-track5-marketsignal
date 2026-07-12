@@ -99,10 +99,7 @@ else:
     # Esto te dirá por qué falló la conexión
     st.sidebar.write("Estado interno del motor:", "Modelo no cargado.")
 
-st.sidebar.markdown("---")
-st.sidebar.subheader("📈 Tickers en Vivo (Simulado)")
-for a in activos_db[:4]:
-    st.sidebar.metric(f"{a['name']} ({a['symbol']})", a['current_price'], f"{a['price_move_7d']}%")
+
 
 # --- ENCABEZADO Y FILTROS (HU 1) ---
 st.title("📡 Radar Agéntico de Inteligencia de Mercado")
@@ -244,7 +241,7 @@ with tab2:
     mercado_seleccionado = st.selectbox("Seleccione el Mercado para el Briefing:", mercados_disponibles)
     
     # 2. Tabla de Simulación (Estilo "All Cryptocurrencies")
-    st.write(f"### Activos principales {mercado_seleccionado}")
+    st.write(f"### Activos principales")
     
     # Filtrar activos para la tabla
     activos_tabla = [a for a in activos_db if a["type"] == mercado_seleccionado]
