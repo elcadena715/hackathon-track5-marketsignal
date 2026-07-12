@@ -302,10 +302,10 @@ with tab3:
     st.write("Resumen consolidado exclusivo para comités de inversión. **Solo incluye señales marcadas como Aprobadas por analistas humanos**.")
     
     revs = obtener_revisiones()
-    aprobadas = {k: v for k, v in revs.items() if "Aprobada" in v["status"]}
+    aprobadas = {k: v for k, v in revs.items() if "Validada" in v["status"]}
     
     if not aprobadas:
-        st.warning("No hay señales aprobadas aún. Ve a la pestaña de Radar, escribe una justificación y aprueba una alerta para generar el briefing.")
+        st.warning("No hay señales aprobadas aún. Ve a la pestaña de Radar, escribe una justificación y haz clic en ✅ Validar para generar el briefing.")
     else:
         for sid, datos in aprobadas.items():
             st.markdown(f"### 📌 Señal Auditada: `{sid}`")
