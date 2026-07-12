@@ -15,32 +15,30 @@ st.set_page_config(page_title="MarketSignal Guardian", layout="wide", page_icon=
 # Estilos CSS - Fin-AI Terminal Dark
 st.markdown("""
 <style>
-/* 1. Reset base de tabs */
+
 div[data-testid="stTabs"] button {
     background-color: #161b22; /* Fondo oscuro */
     border: 1px solid #30363d;
     color: #c9d1d9;
     padding: 12px 24px;
-    border-radius: 6px; /* Bordes redondeados para parecer botón */
+    border-radius: 6px; 
     margin-right: 10px;
     transition: all 0.3s ease;
 }
 
-/* 2. Estado Activo (Cuando haces clic) */
 div[data-testid="stTabs"] button[aria-selected="true"] {
-    background-color: #28a745 !important; /* Verde Corporativo */
+    background-color: #28a745 !important; 
     color: white !important;
     border: 1px solid #28a745 !important;
     font-weight: bold;
 }
 
-/* 3. Hover (Efecto al pasar el mouse) */
+/* 3. Hover 
 div[data-testid="stTabs"] button:hover {
     border: 1px solid #28a745;
     color: #28a745;
 }
 
-/* 4. Ocultar la línea roja genérica que tenías */
 div[data-testid="stTabs"] [data-baseweb="tab-list"] {
     border-bottom: none;
     gap: 10px;
@@ -213,6 +211,8 @@ with tab2:
     if not aprobadas:
         st.warning("No hay señales aprobadas aún. Ve a la pestaña de Radar, escribe una justificación y aprueba una alerta para generar el briefing.")
     else:
+        # Línea de depuración para confirmar los datos
+st.write("Datos de auditoría detectados:", aprobadas)
         for sid, datos in aprobadas.items():
             st.markdown(f"### 📌 Señal Auditada: `{sid}`")
             st.markdown(f"**Revisor Fiduciario:** {datos['reviewer']} | **Fecha:** {datos['date'][:16]}")
