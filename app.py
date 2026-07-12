@@ -79,7 +79,7 @@ with c_act:
 
 with c_ref:
     # Espaciador para alinear visualmente el botón con la parte inferior de los selectbox
-    st.write("") 
+    
     st.write("") 
     if st.button("🔄 Sincronizar", use_container_width=True):
         st.toast("Pipeline sincronizado.", icon="✅")
