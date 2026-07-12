@@ -290,41 +290,27 @@ with tab2:
         if auditoria:
             if "Validada" in auditoria["status"]:
                 estado_badge = "✅ Validada"
-                estado_color = "green"
             elif "Escalada" in auditoria["status"]:
                 estado_badge = "⚠️ Escalada"
-                estado_color = "orange"
             elif "Descartada" in auditoria["status"]:
                 estado_badge = "🗑️ Descartada"
-                estado_color = "red"
             else:
                 estado_badge = "❓ Sin Auditoría"
-                estado_color = "gray"
         else:
             estado_badge = "❓ Sin Auditoría"
-            estado_color = "gray"
         
-        with st.container(border=True):
-            col_img, col_txt = st.columns([1, 3])
-            with col_txt:
-                st.markdown(f"##### {noti['title']}")
-                st.caption(f"{noti['source']['name']} | {noti['publishedAt'][:10]}")
-                
-                # Mostrar estado de auditoría
-                if estado_color == "green":
-                    st.success(f"**Estado:** {estado_badge}")
-                elif estado_color == "orange":
-                    st.warning(f"**Estado:** {estado_badge}")
-                elif estado_color == "red":
-                    st.error(f"**Estado:** {estado_badge}")
-                else:
-                    st.info(f"**Estado:** {estado_badge}")
-                
-                # Botón que actúa como enlace a la noticia detallada
-                if st.button("Leer Análisis IA", key=f"link_{noti['id']}"):
-                    st.session_state.selected_news = (noti, next((a for a in activos_db if a["symbol"] in str(noti.get("related_assets"))), activos_db[0]), f"sig_{noti['id']}")
-                    st.session_state.view = 'detail'
-                    st.switch_page("app.py")
+        st.markdown(f"**{noti['title']}**")
+        col_meta, col_estado = st.columns([3, 1])
+        with col_meta:
+            st.caption(f"{noti['source']['name']} | {noti['publishedAt'][:10]}")
+        with col_estado:
+            st.caption(f"Estado: {estado_badge}")
+        
+        if st.button("Leer Análisis IA", key=f"link_{noti['id']}", use_container_width=True):
+            st.session_state.selected_news = (noti, next((a for a in activos_db if a["symbol"] in str(noti.get("related_assets"))), activos_db[0]), f"sig_{noti['id']}")
+            st.session_state.view = 'detail'
+            st.switch_page("app.py")
+        st.divider()
 
 with tab3:
     st.subheader("📑 Reporte de Compliance")
