@@ -10,7 +10,8 @@ def init_db():
         cursor = conn.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS reviews (
-                signal_id TEXT PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                signal_id TEXT NOT NULL,
                 status TEXT NOT NULL,
                 justification TEXT NOT NULL,
                 reviewer TEXT NOT NULL,
@@ -23,7 +24,7 @@ def guardar_revision(signal_id, status, justification, reviewer="Analista de Tur
     with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT OR REPLACE INTO reviews (signal_id, status, justification, reviewer, created_at)
+            INSERT INTO reviews (signal_id, status, justification, reviewer, created_at)
             VALUES (?, ?, ?, ?, ?)
         """, (signal_id, status, justification, reviewer, datetime.now().isoformat()))
         conn.commit()
