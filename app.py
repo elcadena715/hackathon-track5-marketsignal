@@ -94,10 +94,10 @@ if motor.model:
     st.sidebar.success("🟢 Cerebro IA: Gemini 1.5 Flash Activo")
 else:
     st.sidebar.warning("🟡 Cerebro IA: Modo Simulación / Fórmula 9.2")
-else:
-    st.sidebar.error("🔴 Cerebro IA: DESCONECTADO")
-    # Esto te dirá por qué falló la conexión
-    st.sidebar.write("Estado interno del motor:", "Modelo no cargado.")
+    else:
+        st.sidebar.error("🔴 Cerebro IA: DESCONECTADO")
+        # Esto te dirá por qué falló la conexión
+        st.sidebar.write("Estado interno del motor:", "Modelo no cargado.")
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("📈 Tickers en Vivo (Simulado)")
