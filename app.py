@@ -153,8 +153,8 @@ with tab1:
                     break
         
         # 2. Filtros (Si no coinciden, saltamos esta noticia)
-            #if cat_filtro != "Todos" and activo_rel["type"] != cat_filtro: continue
-            #if simbolo_filtro != "Todos" and activo_rel["symbol"] != simbolo_filtro: continue
+            if cat_filtro != "Todos" and activo_rel["type"] != cat_filtro: continue
+            if simbolo_filtro != "Todos" and activo_rel["symbol"] != simbolo_filtro: continue
 
             sid = f"sig_{activo_rel['symbol']}_{i}"
             
