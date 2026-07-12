@@ -131,7 +131,7 @@ with tab1:
             with col1:
                 st.markdown(f"#### 📰 {noti.get('title')}")
                 st.caption(f"**Fuente:** {noti.get('source', {}).get('name', 'N/A')} | **Fecha:** {noti.get('publishedAt', '')[:10]} | **Activo:** `{activo_rel['name']} ({activo_rel['symbol']})`")
-                st.caption(f"**ID Auditoría:** `{sid}`") # ID solicitado
+                st.caption(f"**ID Auditoría:** `{sid}`") 
                 st.write(noti.get("description", "Sin descripción detallada."))
             
             # Columna derecha: Impacto y métricas
@@ -140,22 +140,21 @@ with tab1:
                 color = "🟢" if imp == "Positivo" else ("🔴" if imp == "Negativo" else ("⚪" if imp == "Neutral" else "🟡"))
                 st.markdown(f"### {color} Impacto: **{imp.upper()}**")
                 st.caption(f"Confianza IA: **{senal['confianza']}** ({senal.get('confianza_score', 'N/A')}) | Precio 7d: **{activo_rel['price_move_7d']}%**")
-                
-                # Expandible de Explicabilidad (Mantenido igual)
-                with st.expander("🔍 Ver Explicabilidad y Acción Recomendada", expanded=False):
-                    st.write(f"**Explicación Técnica:** {senal['explicacion']}")
-                    st.markdown(f"**⚡ Acción de Investigación:** *{senal['accion_investigacion']}*")
-                    st.caption(f"⚠️ *{senal['disclaimer']}*")
 
-            # Flujo de Auditoría (Acordeón compacto)
+            # 1. Expandible de Explicabilidad (Ahora arriba, desplegable)
+            with st.expander("🔍 Ver Explicabilidad y Acción Recomendada"):
+                st.write(f"**Explicación Técnica:** {senal['explicacion']}")
+                st.markdown(f"**⚡ Acción de Investigación:** *{senal['accion_investigacion']}*")
+                st.caption(f"⚠️ *{senal['disclaimer']}*")
+
+            # 2. Expandible de Auditoría (Workflow de Cumplimiento)
             with st.expander("📝 Crear Auditoría (Workflow de Cumplimiento)"):
                 st.markdown(f"**Estado de Auditoría:** `{estado_rev}`")
                 justificacion = st.text_area("Justificación técnica obligatoria (Trazabilidad):", key=f"just_{sid}")
                 
-                # Título para la sección de decisión
                 st.markdown("**Decisión fiduciaria:**")
                 
-                # Botones juntos: Ajuste de columnas para que estén más apretados
+                # Botones juntos
                 b1, b2, b3 = st.columns([1, 1, 1])
                 if b1.button("✅ Validar", key=f"ok_{sid}"):
                     if len(justificacion) < 5: 
