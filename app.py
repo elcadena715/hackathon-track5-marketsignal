@@ -7,9 +7,13 @@ from agents.motor import MotorAgentesIA
 from core.database import init_db, guardar_revision, obtener_revisiones
 from datetime import datetime
 
-# Inicializar Base de Datos SQLite y Memoria Caché de Señales
+
 init_db()
 if "senales_cache" not in st.session_state: st.session_state.senales_cache = {}
+if 'view' not in st.session_state:
+    st.session_state.view = 'list'
+if 'selected_news' not in st.session_state:
+    st.session_state.selected_news = None
 
 st.set_page_config(page_title="MarketSignal Guardian", layout="wide", page_icon="🏦")
 
