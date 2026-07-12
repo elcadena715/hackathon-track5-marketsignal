@@ -15,24 +15,37 @@ st.set_page_config(page_title="MarketSignal Guardian", layout="wide", page_icon=
 # Estilos CSS - Fin-AI Terminal Dark
 st.markdown("""
 <style>
-    /* Estilo de botones de tabulación tipo Terminal */
-    div[data-testid="stTabs"] button {
-        background-color: #161b22;
-        border: 1px solid #30363d;
-        border-radius: 4px 4px 0 0;
-        padding: 10px 20px;
-        color: #8b949e;
-    }
-    div[data-testid="stTabs"] button[aria-selected="true"] {
-        background-color: #21262d;
-        color: #58a6ff;
-        border-bottom: 2px solid #58a6ff;
-    }
-    /* Elimina el espacio innecesario */
-    .stTabs {
-        gap: 0px;
-    }
-    </style>
+/* 1. Reset base de tabs */
+div[data-testid="stTabs"] button {
+    background-color: #161b22; /* Fondo oscuro */
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    padding: 12px 24px;
+    border-radius: 6px; /* Bordes redondeados para parecer botón */
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+/* 2. Estado Activo (Cuando haces clic) */
+div[data-testid="stTabs"] button[aria-selected="true"] {
+    background-color: #28a745 !important; /* Verde Corporativo */
+    color: white !important;
+    border: 1px solid #28a745 !important;
+    font-weight: bold;
+}
+
+/* 3. Hover (Efecto al pasar el mouse) */
+div[data-testid="stTabs"] button:hover {
+    border: 1px solid #28a745;
+    color: #28a745;
+}
+
+/* 4. Ocultar la línea roja genérica que tenías */
+div[data-testid="stTabs"] [data-baseweb="tab-list"] {
+    border-bottom: none;
+    gap: 10px;
+}
+</style>
 """, unsafe_allow_html=True)
 
 # Cargar Datos Estáticos de Respaldo
