@@ -44,6 +44,21 @@ div[data-testid="stTabs"] [data-baseweb="tab-list"] {
     border-bottom: none;
     gap: 10px;
 }
+div.stButton > button {
+        background-color: #161b22; /* Fondo oscuro consistente */
+        color: #c9d1d9;
+        border: 1px solid #30363d; /* Borde sutil */
+        border-radius: 4px;
+        padding: 6px 12px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    /* 2. Efecto Hover: Resaltado sutil */
+    div.stButton > button:hover {
+        background-color: #21262d;
+        border: 1px solid #58a6ff; /* Acento azul financiero */
+        color: #58a6ff;
+    }
 </style>
 """, unsafe_allow_html=True)
 
