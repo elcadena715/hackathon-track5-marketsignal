@@ -211,8 +211,6 @@ with tab2:
     if not aprobadas:
         st.warning("No hay señales aprobadas aún. Ve a la pestaña de Radar, escribe una justificación y aprueba una alerta para generar el briefing.")
     else:
-        # Línea de depuración para confirmar los datos
-        st.write("Datos de auditoría detectados:", aprobadas)
         for sid, datos in aprobadas.items():
             st.markdown(f"### 📌 Señal Auditada: `{sid}`")
             st.markdown(f"**Revisor Fiduciario:** {datos['reviewer']} | **Fecha:** {datos['date'][:16]}")
