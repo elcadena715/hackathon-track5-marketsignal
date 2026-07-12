@@ -92,12 +92,12 @@ motor = obtener_motor(api_key_gemini)
 # 4. Indicador visual limpio para el jurado (Sin mostrar contraseñas)
 if motor.model:
     st.sidebar.success("🟢 Cerebro IA: Gemini 1.5 Flash Activo")
-else:
+elif motor.simulation:
     st.sidebar.warning("🟡 Cerebro IA: Modo Simulación / Fórmula 9.2")
-    else:
-        st.sidebar.error("🔴 Cerebro IA: DESCONECTADO")
-        # Esto te dirá por qué falló la conexión
-        st.sidebar.write("Estado interno del motor:", "Modelo no cargado.")
+else:
+    st.sidebar.error("🔴 Cerebro IA: DESCONECTADO")
+    # Esto te dirá por qué falló la conexión
+    st.sidebar.write("Estado interno del motor:", "Modelo no cargado.")
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("📈 Tickers en Vivo (Simulado)")
