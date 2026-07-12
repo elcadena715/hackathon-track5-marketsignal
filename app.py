@@ -69,14 +69,20 @@ st.title("📡 Radar Agéntico de Inteligencia de Mercado")
 st.markdown("**Agentes integrados:** `Coyuntura`, `Asesor Inversiones`, `Cumplimiento Riesgo` & `Generador Briefing`")
 st.info("💡 **Regla del Track 5:** Transforma noticias en señales explicables sin ejecutar compras ni ventas y con control humano en bucle.")
 
-c_f1, c_f2, c_f3 = st.columns([2, 2, 1])
-with c_f1:
-    cat_filtro = st.selectbox("1. Filtrar por Categoría:", ["Todas", "Renta Variable", "Instrumentos de crédito", "Criptoactivos", "Otros activos"])
-with c_f2:
-    simbolo_filtro = st.selectbox("2. Filtrar por Activo:", ["Todos"] + [a["symbol"] for a in activos_db])
-with c_f3:
-    if st.button("🔄 Refrescar Noticias", use_container_width=True):
-        st.toast("Noticias Actualizadas", icon="✅")
+c_cat, c_act, c_ref = st.columns([2, 2, 1])
+
+with c_cat:
+    cat_filtro = st.selectbox("1. Categoría:", ["Todas", "Renta Variable", "Instrumentos de crédito", "Criptoactivos", "Otros activos"])
+
+with c_act:
+    simbolo_filtro = st.selectbox("2. Activo:", ["Todos"] + [a["symbol"] for a in activos_db])
+
+with c_ref:
+    # Espaciador para alinear visualmente el botón con la parte inferior de los selectbox
+    st.write("") 
+    st.write("") 
+    if st.button("🔄 Sincronizar", use_container_width=True):
+        st.toast("Pipeline sincronizado.", icon="✅")
         st.session_state.recargar = True
 
 # Obtener Noticias (NewsAPI o Resguardo JSON)
