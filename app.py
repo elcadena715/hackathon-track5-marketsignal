@@ -148,22 +148,27 @@ with tab1:
                 st.caption(f"⚠️ *{senal['disclaimer']}*")
 
             # 2. Expandible de Auditoría (Workflow de Cumplimiento)
-            with st.expander("📝 Crear Auditoría (Workflow de Cumplimiento)"):
+            with st.expander("📝 Crear Auditoría"):
                 st.markdown(f"**Estado de Auditoría:** `{estado_rev}`")
-                justificacion = st.text_area("Justificación técnica obligatoria (Trazabilidad):", key=f"just_{sid}")
+                justificacion = st.text_area("Justificación técnica obligatoria:", key=f"just_{sid}")
                 
-                st.markdown("**Decisión fiduciaria:**")
+                # Diseño compacto: Texto y botones en una misma línea
+                c_titulo, c_botones = st.columns([1, 2]) # El título ocupa 1/3, los botones 2/3
+                with c_titulo:
+                    st.markdown("**Decisión fiduciaria:**")
                 
-                # Botones juntos
-                b1, b2, b3 = st.columns([1, 1, 1])
-                if b1.button("✅ Validar", key=f"ok_{sid}"):
-                    if len(justificacion) < 5: 
-                        st.error("Se requiere justificación para validación.")
-                    else:
-                        guardar_revision(sid, "✅ Validada", justificacion)
-                        st.rerun()
-                b2.button("⚠️ Escalar", key=f"esc_{sid}")
-                b3.button("🗑️ Descartar", key=f"del_{sid}")
+                with c_botones:
+                    # Usamos un contenedor de botones para que no tengan espacio extra
+                    b1, b2, b3 = st.columns(3)
+                    
+                    if b1.button("✅ Validar", key=f"ok_{sid}"):
+                        if len(justificacion) < 5: 
+                            st.error("Se requiere justificación.")
+                        else:
+                            guardar_revision(sid, "✅ Validada", justificacion)
+                            st.rerun()
+                    b2.button("⚠️ Escalar", key=f"esc_{sid}")
+                    b3.button("🗑️ Descartar", key=f"del_{sid}")
             st.markdown("</div>", unsafe_allow_html=True)
 
 with tab2:
