@@ -27,7 +27,7 @@ https://market-signal-guardian.streamlit.app/
 
 ### Primeros Pasos
 1. Abre el link en el navegador
-4. ¡Comienza a analizar señales de mercado!
+4. ¡Comienza a analizar señales de las noticias del mercado!
 
 ---
 
