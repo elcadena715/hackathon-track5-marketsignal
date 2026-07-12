@@ -31,6 +31,48 @@ https://market-signal-guardian.streamlit.app/
 
 ---
 
+## 🧪 Tests Automatizados
+
+La app incluye **40+ tests automatizados** que validan:
+
+### ✅ Test del Agente IA (`test_agent.py`)
+Valida que el motor agéntico responde señales coherentes:
+- Estructura de señal correcta
+- Campos obligatorios presentes (impacto, confianza, explicación, acción)
+- Valores válidos (impacto ∈ {Positivo, Negativo, Neutral})
+- **Diferencia entre noticias positivas y negativas** ← Prueba de inteligencia
+
+### ✅ Test de Persistencia (`test_database.py`)
+Valida que las auditorías se guardan y recuperan correctamente:
+- Guardar y recuperar revisiones
+- Múltiples auditorías
+- Diferentes estados (Validada, Escalada, Descartada)
+
+### ✅ Test de Datos (`test_news_feed.py`)
+Valida integridad de JSONs:
+- Noticias tienen campos requeridos
+- Descripciones completas
+- Activos relacionados válidos
+- Mercados consistentes
+
+### 🚀 Correr Tests
+
+```bash
+# Todos los tests
+pytest test/ -v
+
+# Solo tests del agente (recomendado primero)
+pytest test/test_agent.py -v -s
+
+# Usando script
+run_tests.bat agent          # Windows
+./run_tests.sh agent         # Linux/Mac
+```
+
+**Estado:** ✅ 40+ tests pasando
+
+---
+
 ## 📋 Casos Probados Manualmente
 
 ### Caso 1: Análisis de Noticia (Monitor de Mercado → Detalle)
