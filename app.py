@@ -5,6 +5,7 @@ import requests
 from fpdf import FPDF
 from agents.motor import MotorAgentesIA
 from core.database import init_db, guardar_revision, obtener_revisiones
+from datetime import datetime
 
 # Inicializar Base de Datos SQLite y Memoria Caché de Señales
 init_db()
