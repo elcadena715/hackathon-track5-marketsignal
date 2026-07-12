@@ -124,38 +124,47 @@ with tab1:
 
         estado_rev = revisiones_db.get(sid, {}).get("status", "⏳ Pendiente de Auditoría")
 
-        with st.container(border=True): # Usamos border=True nativo de Streamlit
-            col_header, col_metric = st.columns([3, 1])
-            with col_header:
-                st.markdown(f"#### {noti.get('title')}")
-                st.caption(f"Activo: {activo_rel['name']} | ID Auditoría: {sid}")
-            with col_metric:
-                st.metric("Confianza IA", f"{senal.get('confianza_score', 'N/A')}")
+        with st.container(border=True):
+            col1, col2 = st.columns([3, 2])
             
-            # Botón de visibilidad (Heurística: Visibilidad del sistema)
-            if st.button("🔍 Ver Explicabilidad y Acción Recomendada", key=f"btn_exp_{sid}"):
-                st.info(f"Análisis: {senal['explicacion']}\n\nAcción: {senal['accion_investigacion']}")
+            # Columna izquierda: Información del activo y noticia
+            with col1:
+                st.markdown(f"#### 📰 {noti.get('title')}")
+                st.caption(f"**Fuente:** {noti.get('source', {}).get('name', 'N/A')} | **Fecha:** {noti.get('publishedAt', '')[:10]} | **Activo:** `{activo_rel['name']} ({activo_rel['symbol']})`")
+                st.caption(f"**ID Auditoría:** `{sid}`") # ID solicitado
+                st.write(noti.get("description", "Sin descripción detallada."))
             
-            # Acordeón de Auditoría (Trazabilidad y Prevención de errores)
-            with st.expander("📝 Crear Auditoría "):
-                # Nota: El 'estado' lo definimos nosotros al validar
-                justificacion = st.text_area("Justificación técnica obligatoria:", key=f"just_{sid}")
+            # Columna derecha: Impacto y métricas
+            with col2:
+                imp = senal["impacto"]
+                color = "🟢" if imp == "Positivo" else ("🔴" if imp == "Negativo" else ("⚪" if imp == "Neutral" else "🟡"))
+                st.markdown(f"### {color} Impacto: **{imp.upper()}**")
+                st.caption(f"Confianza IA: **{senal['confianza']}** ({senal.get('confianza_score', 'N/A')}) | Precio 7d: **{activo_rel['price_move_7d']}%**")
                 
-                c1, c2, c3 = st.columns(3)
-                if c1.button("✅ Validar Señal", key=f"val_{sid}"):
-                    if not justificacion:
-                        st.error("Acción bloqueada: Se requiere justificación de auditoría.")
+                # Expandible de Explicabilidad (Mantenido igual)
+                with st.expander("🔍 Ver Explicabilidad y Acción Recomendada", expanded=False):
+                    st.write(f"**Explicación Técnica:** {senal['explicacion']}")
+                    st.markdown(f"**⚡ Acción de Investigación:** *{senal['accion_investigacion']}*")
+                    st.caption(f"⚠️ *{senal['disclaimer']}*")
+
+            # Flujo de Auditoría (Acordeón compacto)
+            with st.expander("📝 Crear Auditoría (Workflow de Cumplimiento)"):
+                st.markdown(f"**Estado de Auditoría:** `{estado_rev}`")
+                justificacion = st.text_area("Justificación técnica obligatoria (Trazabilidad):", key=f"just_{sid}")
+                
+                # Título para la sección de decisión
+                st.markdown("**Decisión fiduciaria:**")
+                
+                # Botones juntos: Ajuste de columnas para que estén más apretados
+                b1, b2, b3 = st.columns([1, 1, 1])
+                if b1.button("✅ Validar", key=f"ok_{sid}"):
+                    if len(justificacion) < 5: 
+                        st.error("Se requiere justificación para validación.")
                     else:
                         guardar_revision(sid, "✅ Validada", justificacion)
                         st.rerun()
-                
-                if c2.button("⚠️ Escalar", key=f"esc_{sid}"):
-                    guardar_revision(sid, "⚠️ Escalada a Riesgos", justificacion or "Revisión técnica de alta prioridad.")
-                    st.rerun()
-                    
-                if c3.button("❌ Descartar", key=f"del_{sid}"):
-                    guardar_revision(sid, "❌ Descartada", justificacion or "Sin relevancia para mercado actual.")
-                    st.rerun()
+                b2.button("⚠️ Escalar", key=f"esc_{sid}")
+                b3.button("🗑️ Descartar", key=f"del_{sid}")
             st.markdown("</div>", unsafe_allow_html=True)
 
 with tab2:
