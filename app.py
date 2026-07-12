@@ -15,9 +15,24 @@ st.set_page_config(page_title="MarketSignal Guardian", layout="wide", page_icon=
 # Estilos CSS - Fin-AI Terminal Dark
 st.markdown("""
 <style>
-    .reportview-container { background: #0e1117; }
-    .signal-card { background-color: #161b22; padding: 18px; border-radius: 8px; border: 1px solid #30363d; margin-bottom: 12px; }
-</style>
+    /* Estilo de botones de tabulación tipo Terminal */
+    div[data-testid="stTabs"] button {
+        background-color: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 4px 4px 0 0;
+        padding: 10px 20px;
+        color: #8b949e;
+    }
+    div[data-testid="stTabs"] button[aria-selected="true"] {
+        background-color: #21262d;
+        color: #58a6ff;
+        border-bottom: 2px solid #58a6ff;
+    }
+    /* Elimina el espacio innecesario */
+    .stTabs {
+        gap: 0px;
+    }
+    </style>
 """, unsafe_allow_html=True)
 
 # Cargar Datos Estáticos de Respaldo
@@ -97,7 +112,7 @@ if api_key_news:
         pass # Si falla internet, se mantiene noticias_resguardo automáticamente
 
 # PESTAÑAS
-tab1, tab2 = st.tabs(["📊 Radar & Señales IA (HU 1 & 2)", "📑 Briefing Ejecutivo Validado (HU 3)"])
+tab1, tab2 = st.tabs(["📊 Monitor de Mercado - A1,A2", "📑 Reporte de Compliance - A3"])
 
 with tab1:
     st.subheader("Titulares y Análisis de Impacto")
@@ -176,7 +191,7 @@ with tab1:
             st.markdown("</div>", unsafe_allow_html=True)
 
 with tab2:
-    st.subheader("📑 Briefing Ejecutivo de Mercado (Agente 4)")
+    st.subheader("📑 Reporte de Compliance - A4")
     st.write("Resumen consolidado exclusivo para comités de inversión. **Solo incluye señales marcadas como Aprobadas por analistas humanos**.")
     
     revs = obtener_revisiones()
