@@ -252,12 +252,12 @@ with tab2:
                 pdf.cell(0, 7, "Justificación técnica:", ln=True)
                 pdf.set_font("Arial", '', 10)
                 pdf.multi_cell(0, 6, datos.get('justification', 'N/A'))
-                pdf.ln(10)
+                pdf.ln(2)
                 pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Línea divisoria entre señales
-                pdf.ln(5)
+                pdf.ln(3)
 
                 # Footer (Legal)
-                pdf.set_y(-40)
+                pdf.set_y(-30)
                 pdf.set_font("Arial", 'I', 8)
                 pdf.multi_cell(0, 4, "ADVERTENCIA LEGAL: Este documento es una herramienta de priorización de investigación basada en análisis agéntico y supervisión humana. No constituye asesoría financiera personalizada ni garantiza rentabilidad. Uso exclusivo para comités internos.")
             
