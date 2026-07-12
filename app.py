@@ -124,44 +124,37 @@ with tab1:
 
         estado_rev = revisiones_db.get(sid, {}).get("status", "⏳ Pendiente de Auditoría")
 
-        with st.container():
-            st.markdown("<div class='signal-card'>", unsafe_allow_html=True)
-            col1, col2 = st.columns([3, 2])
-            with col1:
-                st.markdown(f"#### 📰 {noti.get('title')}")
-                st.caption(f"**Fuente:** {noti.get('source', {}).get('name', 'N/A')} | **Fecha:** {noti.get('publishedAt', '')[:10]} | **Activo:** `{activo_rel['name']} ({activo_rel['symbol']})`")
-                st.write(noti.get("description", "Sin descripción detallada en el feed."))
+        with st.container(border=True): # Usamos border=True nativo de Streamlit
+            col_header, col_metric = st.columns([3, 1])
+            with col_header:
+                st.markdown(f"#### {noti.get('title')}")
+                st.caption(f"Activo: {activo_rel['name']} | ID Auditoría: {sid}")
+            with col_metric:
+                st.metric("Confianza IA", f"{senal.get('confianza_score', 'N/A')}")
             
-            with col2:
-                imp = senal["impacto"]
-                color = "🟢" if imp == "Positivo" else ("🔴" if imp == "Negativo" else ("⚪" if imp == "Neutral" else "🟡"))
-                st.markdown(f"### {color} Impacto: **{imp.upper()}**")
-                st.caption(f"Confianza IA: **{senal['confianza']}** ({senal.get('confianza_score', 'N/A')}) | Precio 7d: **{activo_rel['price_move_7d']}%**")
+            # Botón de visibilidad (Heurística: Visibilidad del sistema)
+            if st.button("🔍 Ver Explicabilidad y Acción Recomendada", key=f"btn_exp_{sid}"):
+                st.info(f"Análisis: {senal['explicacion']}\n\nAcción: {senal['accion_investigacion']}")
+            
+            # Acordeón de Auditoría (Trazabilidad y Prevención de errores)
+            with st.expander("📝 Crear Auditoría "):
+                # Nota: El 'estado' lo definimos nosotros al validar
+                justificacion = st.text_area("Justificación técnica obligatoria:", key=f"just_{sid}")
                 
-                with st.expander("🔍 Ver Explicabilidad y Acción Recomendada", expanded=False):
-                    st.write(f"**Explicación Técnica:** {senal['explicacion']}")
-                    st.markdown(f"**⚡ Acción de Investigación:** *{senal['accion_investigacion']}*")
-                    st.caption(f"⚠️ *{senal['disclaimer']}*")
-            
-            st.markdown("---")
-            # Panel de Revisión Humana - HITL
-            st.markdown(f"**Estado de Auditoría:** `{estado_rev}`")
-            c_a, c_b = st.columns([3, 2])
-            with c_a:
-                just = st.text_input(f"Justificación obligatoria del analista para {sid}:", key=f"j_{sid}")
-            with c_b:
-                st.write("Decisión fiduciaria:")
-                b1, b2, b3 = st.columns(3)
-                if b1.button("✅ Validar Señal", key=f"ok_{sid}"):
-                    if len(just) < 5: st.error("Se requiere justificación detallada para validación.")
+                c1, c2, c3 = st.columns(3)
+                if c1.button("✅ Validar Señal", key=f"val_{sid}"):
+                    if not justificacion:
+                        st.error("Acción bloqueada: Se requiere justificación de auditoría.")
                     else:
-                        guardar_revision(sid, "✅ Validada", just)
+                        guardar_revision(sid, "✅ Validada", justificacion)
                         st.rerun()
-                if b2.button("⚠️ Escalar a Riesgos", key=f"esc_{sid}"):
-                    guardar_revision(sid, "⚠️ Escalada a Riesgos", just or "Revisión técnica de alta prioridad.")
+                
+                if c2.button("⚠️ Escalar", key=f"esc_{sid}"):
+                    guardar_revision(sid, "⚠️ Escalada a Riesgos", justificacion or "Revisión técnica de alta prioridad.")
                     st.rerun()
-                if b3.button("🗑️ Descartar", key=f"del_{sid}"):
-                    guardar_revision(sid, "❌ Descartada", just or "Sin relevancia para mercado actual.")
+                    
+                if c3.button("❌ Descartar", key=f"del_{sid}"):
+                    guardar_revision(sid, "❌ Descartada", justificacion or "Sin relevancia para mercado actual.")
                     st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
 
