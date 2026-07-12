@@ -2,6 +2,7 @@
   {
     "id": "n1",
     "title": "La SEC aprueba nuevas directrices para la custodia bancaria de Bitcoin",
+    "description": "La Comisión de Valores y Bolsa (SEC) ha aprobado nuevas regulaciones que permiten a instituciones bancarias actuar como custodios de Bitcoin y otras criptomonedas. Esta medida representa un hito importante para la adopción institucional de activos digitales, proporcionando mayor seguridad y conformidad regulatoria para inversores institucionales.",
     "source": {"name": "Bloomberg News"},
     "publishedAt": "2026-07-11T09:30:00Z",
     "market": "Criptoactivos",
@@ -10,6 +11,7 @@
   {
     "id": "n2",
     "title": "Tesla supera expectativas de entrega en Q2",
+    "description": "Tesla reportó entregas de vehículos en Q2 que superaron las expectativas del mercado en un 15%, alcanzando un total de 455,000 unidades. La fortaleza en la demanda, especialmente en mercados europeos y asiáticos, respalda la posición de la empresa como líder en vehículos eléctricos. Los analistas proyectan mayor margen operativo en el próximo trimestre.",
     "source": {"name": "Reuters"},
     "publishedAt": "2026-07-11T10:00:00Z",
     "market": "Acciones",
@@ -18,6 +20,7 @@
   {
     "id": "n3",
     "title": "Apple anuncia expansión en servicios de IA generativa",
+    "description": "Apple ha anunciado una iniciativa estratégica para integrar capacidades de inteligencia artificial generativa en sus productos y servicios. La compañía invertirá 2,000 millones de dólares en infraestructura de IA y planea lanzar nuevas funcionalidades de asistente virtual para usuarios de iOS, macOS y otros dispositivos en el cuarto trimestre del año.",
     "source": {"name": "Wall Street Journal"},
     "publishedAt": "2026-07-11T11:00:00Z",
     "market": "Acciones",
@@ -26,6 +29,7 @@
   {
     "id": "n4",
     "title": "Petroecuador reporta incremento histórico en producción",
+    "description": "Petroecuador ha anunciado que la producción de petróleo alcanzó un máximo histórico de 520,000 barriles por día en junio 2026. Este incremento se atribuye a inversiones en tecnología de extracción avanzada y mejora en la capacidad operativa de campos clave. Se espera que esta tendencia continúe en los próximos trimestres, beneficiando los ingresos fiscales del país.",
     "source": {"name": "El Comercio"},
     "publishedAt": "2026-07-11T12:00:00Z",
     "market": "Materias Primas",
@@ -34,6 +38,7 @@
   {
     "id": "n5",
     "title": "Banco Central baja tasas de interés",
+    "description": "El Banco Central ha reducido la tasa de interés de referencia en 50 puntos base, llevándola del 5.25% al 4.75%. Esta medida refleja un entorno inflacionario más controlado y busca estimular la demanda crediticia en el sector privado. Los analistas esperan una cascada de rebajas en tasas de crédito a hipotecas y préstamos personales en las próximas semanas.",
     "source": {"name": "Bloomberg News"},
     "publishedAt": "2026-07-11T13:00:00Z",
     "market": "Bonos",
@@ -42,6 +47,7 @@
   {
     "id": "n6",
     "title": "Empresa líder de Oro reporta hallazgo de nuevas reservas",
+    "description": "Barrick Gold ha anunciado el descubrimiento de nuevas reservas de mineral de oro estimadas en 8 millones de onzas en su mina en Nevada. Los geólogos esperan que estas nuevas reservas extiendan la vida útil de la mina por 12 años adicionales. El hallazgo ha generado optimismo en el sector de minería de metales preciosos y apoya los precios del oro.",
     "source": {"name": "Reuters"},
     "publishedAt": "2026-07-11T14:00:00Z",
     "market": "Materias Primas",
@@ -50,6 +56,7 @@
   {
     "id": "n7",
     "title": "Retraso en cadena de suministro afecta chips",
+    "description": "Fabricantes de semiconductores reportan nuevos retrasos en la cadena de suministro global debido a disrupciones logísticas en puertos clave de Asia. NVIDIA e Intel advierten que la escasez de componentes electrónicos podría afectar la producción de equipos de computación de alto rendimiento en Q3. Se estima un impacto negativo de 2-3% en márgenes operativos.",
     "source": {"name": "Wall Street Journal"},
     "publishedAt": "2026-07-11T15:00:00Z",
     "market": "Acciones",
@@ -58,6 +65,7 @@
   {
     "id": "n8",
     "title": "Caída en precio de Materias Primas impacta sector minero",
+    "description": "Los precios de oro y cobre han caído un 8% y 12% respectivamente en las últimas dos semanas, impulsados por un dólar más fuerte y debilidad en la demanda global de commodities. Empresas mineras globales están reconduciendo inversiones de expansión y ajustando proyecciones de ganancias. Se espera volatilidad continua en este sector durante el resto del trimestre.",
     "source": {"name": "Bloomberg News"},
     "publishedAt": "2026-07-11T16:00:00Z",
     "market": "Materias Primas",
@@ -66,6 +74,7 @@
   {
     "id": "n9",
     "title": "Reguladores investigan brecha de seguridad en Exchange",
+    "description": "Autoridades regulatorias han iniciado una investigación formal sobre una brecha de seguridad en el exchange de criptomonedas FTX 2.0, donde datos personales de 150,000 usuarios fueron comprometidos. El incidente ha generado preocupación sobre estándares de ciberseguridad en plataformas de trading de activos digitales y podría resultar en nuevas regulaciones más estrictas.",
     "source": {"name": "Reuters"},
     "publishedAt": "2026-07-11T17:00:00Z",
     "market": "Criptoactivos",
