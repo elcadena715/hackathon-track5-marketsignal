@@ -229,12 +229,8 @@ with tab1:
                     guardar_revision(sid, "✅ Validada", justificacion)
                     st.success("Guardado.")
                 else: st.error("Se requiere justificación.")
-            if b2.button("⚠️ Escalar", key=f"esc_{sid}"):
-                guardar_revision(sid, "⚠️ Escalada", justificacion)
-                st.rerun()
-            if b3.button("🗑️ Descartar", key=f"del_{sid}"):
-                guardar_revision(sid, "🗑️ Descartada", justificacion)
-                st.rerun()
+            b2.button("⚠️ Escalar", key=f"esc_{sid}")
+            b3.button("🗑️ Descartar", key=f"del_{sid}")
 
 with tab2: 
     st.subheader("📊 Briefing de Mercado")
