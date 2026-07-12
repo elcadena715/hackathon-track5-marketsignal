@@ -143,21 +143,37 @@ with tab1:
         st.subheader("Titulares y Análisis de Impacto")
         revisiones_db = obtener_revisiones()
         
-        for i, noti in enumerate(noticias_actuales):
-            activo_rel = activos_db[0]
-            for a in activos_db:
-                if a["symbol"] in noti.get("title", "") or a["symbol"] in str(noti.get("related_assets", "")):
-                    activo_rel = a
-                    break
-            
-            if cat_filtro != "Todos" and activo_rel["type"] != cat_filtro: continue
-            if simbolo_filtro != "Todos" and activo_rel["symbol"] != simbolo_filtro: continue
+        # Aseguramos que usamos todas las noticias cargadas
+    for i, noti in enumerate(noticias_actuales):
+        # 1. Mapear activo (Lógica de búsqueda)
+        activo_rel = activos_db[0]
+        for a in activos_db:
+            if a["symbol"] in str(noti.get("related_assets", [])):
+                activo_rel = a
+                break
+        
+        # 2. Filtros (Si no coinciden, saltamos esta noticia)
+        if cat_filtro != "Todos" and activo_rel["type"] != cat_filtro: continue
+        if simbolo_filtro != "Todos" and activo_rel["symbol"] != simbolo_filtro: continue
 
-            sid = f"sig_{activo_rel['symbol']}_{i}"
+        sid = f"sig_{activo_rel['symbol']}_{i}"
+        
+        # 3. Procesar impacto (Caché inteligente)
+        if sid not in st.session_state.senales_cache:
+            st.session_state.senales_cache[sid] = motor.procesar_pipeline(noti, activo_rel)
+        senal = st.session_state.senales_cache[sid]
+
+        # 4. Renderizado estilo Bloomberg (con Impacto incluido)
+        with st.container(border=True):
+            st.markdown(f"#### {noti.get('title')}")
             
-            with st.container(border=True):
-                st.markdown(f"#### 📰 {noti.get('title')}")
+            # Línea de metadatos con Impacto destacado
+            imp = senal["impacto"]
+            col_info, col_btn = st.columns([3, 1])
+            
+            with col_info:
                 st.caption(f"**Activo:** `{activo_rel['name']} ({activo_rel['symbol']})` | **Fuente:** {noti.get('source', {}).get('name', 'N/A')}")
+                st.markdown(f"**Impacto:** {imp.upper()}")
                 
                 if st.button("🔍 Ver Análisis Detallado", key=f"det_{sid}"):
                     st.session_state.selected_news = (noti, activo_rel, sid)
