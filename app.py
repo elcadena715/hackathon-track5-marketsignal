@@ -243,7 +243,7 @@ with tab2:
     mercado_seleccionado = st.selectbox("Seleccione el Mercado para el Briefing:", mercados_disponibles)
     
     # 2. Tabla de Simulación (Estilo "All Cryptocurrencies")
-    st.write(f"### Activos principales: {mercado_seleccionado}")
+    st.write(f"### Activos principales {mercado_seleccionado}")
     
     # Filtrar activos para la tabla
     activos_tabla = [a for a in activos_db if a["type"] == mercado_seleccionado]
@@ -266,16 +266,19 @@ with tab2:
     st.markdown("---")
     st.write(f"### Noticias recientes de {mercado_seleccionado}")
     
-    # Filtrar noticias según mercado
     noticias_contexto = [n for n in noticias_actuales if n.get("market") == mercado_seleccionado]
     
-    if noticias_contexto:
-        for noti in noticias_contexto:
-            with st.container():
-                st.markdown(f"**{noti['title']}**")
-                st.caption(f"Fuente: {noti['source']['name']} | {noti['publishedAt'][:10]}")
-                st.write(noti.get("description", ""))
-                st.divider()
+    for noti in noticias_contexto:
+        with st.container():
+            col_img, col_txt = st.columns([1, 3])
+            with col_txt:
+                st.markdown(f"##### {noti['title']}")
+                st.caption(f"{noti['source']['name']} | {noti['publishedAt'][:10]}")
+                # Botón que actúa como enlace a la noticia detallada
+                if st.button("Leer Análisis IA", key=f"link_{noti['id']}"):
+                    st.session_state.selected_news = (noti, next((a for a in activos_db if a["symbol"] in str(noti.get("related_assets"))), activos_db[0]), f"sig_{noti['id']}")
+                    st.session_state.view = 'detail'
+                    st.switch_page("app.py")
     else:
         st.warning("No hay noticias relevantes para este mercado en este momento.")
 
