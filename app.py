@@ -1,323 +1,528 @@
 import streamlit as st
-import json
 import os
-import requests
+import json
 import plotly.express as px
 import plotly.graph_objects as go
+
 from agents.motor import MotorAgentesIA
 from core.database import init_db, guardar_revision, obtener_revisiones
 
-# Inicializar Base de Datos SQLite y Memoria Caché de Señales
+# =====================================================
+# INICIALIZACIÓN
+# =====================================================
+
 init_db()
-if "senales_cache" not in st.session_state: st.session_state.senales_cache = {}
 
-st.set_page_config(page_title="MarketSignal Guardian | Track 5", layout="wide", page_icon="⚡")
+if "resultado_ia" not in st.session_state:
+    st.session_state.resultado_ia = None
 
-# Estilos CSS - Fin-AI Terminal Dark
-st.markdown("""
+
+st.set_page_config(
+    page_title="MarketSignal Guardian | Track 5", layout="wide", page_icon="⚡"
+)
+
+
+# =====================================================
+# ESTILOS
+# =====================================================
+
+st.markdown(
+    """
 <style>
-    .reportview-container { background: #0e1117; }
-    .signal-card { background-color: #161b22; padding: 18px; border-radius: 8px; border: 1px solid #30363d; margin-bottom: 12px; }
-</style>
-""", unsafe_allow_html=True)
 
-# Cargar Datos Estáticos de Respaldo
-@st.cache_data
-def cargar_catalogos():
-    with open(os.path.join("data", "assets.json"), "r", encoding="utf-8") as f:
-        activos = json.load(f)
-    with open(os.path.join("data", "news_feed.json"), "r", encoding="utf-8") as f:
-        noticias_default = json.load(f)
-    return activos, noticias_default
+.reportview-container {
+    background: #0e1117;
+}
+
+
+.signal-card {
+
+    background-color:#161b22;
+    padding:18px;
+    border-radius:8px;
+    border:1px solid #30363d;
+    margin-bottom:12px;
+
+}
+
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
+
+# =====================================================
+# MÉTRICAS DE AGENTES
+# =====================================================
 
 
 def get_agent_metrics(senal):
+
     impacto = senal.get("impacto", "Neutral")
-    impacto_map = {"Positivo": 0.85, "Neutral": 0.55, "Negativo": 0.25, "Incierto": 0.45}
+
+    impacto_map = {
+        "Positivo": 0.85,
+        "Neutral": 0.55,
+        "Negativo": 0.25,
+        "Incierto": 0.45,
+    }
+
     impacto_score = impacto_map.get(impacto, 0.5)
 
-    confianza_score = float(senal.get("confianza_score", 0.5)) if senal.get("confianza_score") is not None else 0.5
+    confianza_score = float(senal.get("confianza_score", 0.5))
+
     asesor_score = min(1.0, max(0.0, (confianza_score + impacto_score) / 2))
 
-    cumplimiento_score = 1.0 if "ajustado" not in senal.get("explicacion", "").lower() else 0.65
+    cumplimiento_score = 1.0
 
     return [
         {"agente": "Coyuntura", "score": impacto_score, "label": f"Impacto: {impacto}"},
-        {"agente": "Asesor Inversiones", "score": asesor_score, "label": f"Confianza: {round(confianza_score * 100)}%"},
-        {"agente": "Cumplimiento Riesgo", "score": cumplimiento_score, "label": f"Control: {round(cumplimiento_score * 100)}%"}
+        {
+            "agente": "Asesor Inversiones",
+            "score": asesor_score,
+            "label": f"Confianza: {round(confianza_score*100)}%",
+        },
+        {
+            "agente": "Cumplimiento Riesgo",
+            "score": cumplimiento_score,
+            "label": "Control: 100%",
+        },
     ]
 
 
-activos_db, noticias_resguardo = cargar_catalogos()
+# =====================================================
+# SIDEBAR
+# =====================================================
 
-# --- BARRA LATERAL (CONECTORES Y TICKERS) ---
 st.sidebar.title("⚡ MarketSignal Guardian")
+
 st.sidebar.caption("Hackathon Agentic Scale - Track 5")
+
 st.sidebar.markdown("---")
 
-# --- LECTURA INTELIGENTE DE LLAVES (SECRETS + INPUT) ---
-# Intenta leer primero de los secretos de Streamlit (st.secrets) o de variables de entorno
-#gemini_default = st.secrets.get("GEMINI_API_KEY", os.getenv("GEMINI_API_KEY", ""))
-#news_default = st.secrets.get("NEWS_API_KEY", os.getenv("NEWS_API_KEY", ""))
 
-# La casilla de texto toma el valor por defecto del servidor, el jurado no necesita tocarla
 api_key_gemini = st.sidebar.text_input("🔑 Google Gemini API Key:", type="password")
-api_key_news = st.sidebar.text_input("📰 NewsAPI Key (Opcional):", type="password")
+
+
+# Crear motor IA
 
 motor = MotorAgentesIA(api_key=api_key_gemini)
+
+
 if motor.model:
-    st.sidebar.success("🟢 Cerebro IA: Gemini 1.5 Flash Activo")
+
+    st.sidebar.success("🟢 Gemini conectado")
+
+
 else:
-    st.sidebar.warning("🟡 Cerebro IA: Modo Simulación / Fórmula 9.2")
+
+    st.sidebar.error("🔴 Gemini no disponible")
+
 
 st.sidebar.markdown("---")
-st.sidebar.subheader("📈 Tickers en Vivo (Simulado)")
-for a in activos_db[:4]:
-    st.sidebar.metric(f"{a['name']} ({a['symbol']})", a['current_price'], f"{a['price_move_7d']}%")
 
-# --- ENCABEZADO Y FILTROS (HU 1) ---
+
+st.sidebar.info("""
+Este sistema funciona únicamente
+con análisis generado por Gemini.
+
+No utiliza datos simulados.
+""")
+
+
+# =====================================================
+# TITULO PRINCIPAL
+# =====================================================
+
+
 st.title("📡 Radar Agéntico de Inteligencia de Mercado")
-st.markdown("**Agentes integrados:** `Coyuntura`, `Asesor Inversiones`, `Cumplimiento Riesgo` & `Generador Briefing`")
-st.info("💡 **Regla del Track 5:** Transforma noticias en señales explicables sin ejecutar compras ni ventas y con control humano en bucle.")
+
+
+st.markdown("""
+**Agentes integrados:**
+
+`Coyuntura`
+`Asesor Inversiones`
+`Cumplimiento Riesgo`
+`Generador Briefing`
+
+""")
+
+
+st.info("""
+💡 Regla del Track 5:
+
+Transforma noticias en señales explicables
+sin ejecutar compras ni ventas y con control
+humano en bucle.
+""")
+
+
 st.markdown("### 📰 Analizar una noticia")
+
 
 texto_noticia = st.text_area(
     "Pegue aquí el texto de la noticia",
-    height=200,
-    placeholder="Ejemplo: NVIDIA anunció nuevos chips para IA y las acciones subieron..."
+    height=220,
+    placeholder="""
+
+Ejemplo:
+
+NVIDIA anunció nuevos chips de inteligencia artificial
+y espera aumentar sus ingresos durante el próximo trimestre.
+
+""",
 )
 
-analizar = st.button("🔍 Analizar noticia")
-c_f1, c_f2, c_f3 = st.columns([2, 2, 1])
-with c_f1:
-    cat_filtro = st.selectbox("1. Filtrar por Categoría:", ["Todas", "Renta Variable", "Instrumentos de crédito", "Criptoactivos", "Otros activos"])
-with c_f2:
-    simbolo_filtro = st.selectbox("2. Filtrar por Activo:", ["Todos"] + [a["symbol"] for a in activos_db])
-with c_f3:
-    if st.button("🚀 Consultar Feeds", use_container_width=True):
-        st.session_state.recargar = True
 
-# Obtener Noticias (NewsAPI o Resguardo JSON)
-noticias_actuales = noticias_resguardo
-if api_key_news:
-    try:
-        query_str = " OR ".join([a["symbol"] for a in activos_db])
-        url = f"https://newsapi.org/v2/everything?q={query_str}&language=es,en&sortBy=publishedAt&pageSize=6&apiKey={api_key_news}"
-        res = requests.get(url, timeout=3).json()
-        if res.get("status") == "ok" and res.get("articles"):
-            noticias_actuales = res["articles"]
-    except Exception:
-        pass # Si falla internet, se mantiene noticias_resguardo automáticamente
+analizar = st.button("🔍 Analizar noticia con Gemini", disabled=not motor.model)
 
+
+if not motor.model:
+
+    st.warning("""
+Ingrese una API Key válida de Gemini
+para habilitar el análisis.
+""")
+
+    st.stop()
+# =====================================================
 # PESTAÑAS
-tab1, tab2 = st.tabs(["📊 Radar & Señales IA (HU 1 & 2)", "📑 Briefing Ejecutivo Validado (HU 3)"])
+# =====================================================
+
+
+tab1, tab2 = st.tabs(
+    ["📊 Radar & Señales IA (HU 1 & 2)", "📑 Briefing Ejecutivo Validado (HU 3)"]
+)
+
+
+# =====================================================
+# TAB 1
+# =====================================================
+
 
 with tab1:
+
     st.subheader("Titulares y Análisis de Impacto")
-    revisiones_db = obtener_revisiones()
-    
-    for i, noti in enumerate(noticias_actuales):
-        # Mapear noticia a un activo del catálogo
-        activo_rel = activos_db[0]
-        for a in activos_db:
-            if a["symbol"] in noti.get("title", "") or a["symbol"] in str(noti.get("related_assets", "")):
-                activo_rel = a
-                break
-        
-        # Filtros de UI
-        if cat_filtro != "Todas" and activo_rel["type"] != cat_filtro: continue
-        if simbolo_filtro != "Todos" and activo_rel["symbol"] != simbolo_filtro: continue
 
-        sid = f"sig_{activo_rel['symbol']}_{i}"
-        
-        # --- CACHÉ INTELIGENTE DE SEÑALES ---
-        # Si la señal no está en memoria, llamamos a la IA (Gemini) y la guardamos
-        if sid not in st.session_state.senales_cache:
-            st.session_state.senales_cache[sid] = motor.procesar_pipeline(noti, activo_rel)
-        
-        # Leemos la señal directamente de la memoria rápida
-        senal = st.session_state.senales_cache[sid]
-        # -------------------------------------
+    # ==========================================
+    # EJECUTAR GEMINI
+    # ==========================================
 
-        estado_rev = revisiones_db.get(sid, {}).get("status", "⏳ Pendiente de Auditoría")
-        with st.expander(f"📰 {noti.get('title')} | Estado: {estado_rev}", expanded=False):
-            with st.container():
-                col1, col2 = st.columns([3, 2])
-                with col1:
-                    st.caption(f"**Fuente:** {noti.get('source', {}).get('name', 'N/A')} | **Fecha:** {noti.get('publishedAt', '')[:10]} | **Activo:** `{activo_rel['name']} ({activo_rel['symbol']})`")
-                    st.write(noti.get("description", "Sin descripción detallada en el feed."))
-                
-                with col2:
-                    imp = senal["impacto"]
-                    color = "🟢" if imp == "Positivo" else ("🔴" if imp == "Negativo" else ("⚪" if imp == "Neutral" else "🟡"))
-                    st.markdown(f"### {color} Impacto: **{imp.upper()}**")
-                    st.caption(f"Confianza IA: **{senal['confianza']}** ({senal.get('confianza_score', 'N/A')}) | Precio 7d: **{activo_rel['price_move_7d']}%**")
-                    
-                    with st.container():
-                        st.write("🔍 Ver Explicabilidad y Acción Recomendada")
-                        st.write(f"**Explicación Técnica:** {senal['explicacion']}")
-                        st.markdown(f"**⚡ Acción de Investigación:** *{senal['accion_investigacion']}*")
-                        st.caption(f"⚠️ *{senal['disclaimer']}*")
+    if analizar:
 
-                    with st.container():
-                        st.write("📊 Métricas de Agentes")
-                        
-                        agent_metrics = get_agent_metrics(senal)
-                        tipo = senal.get("tipo_grafico", "bar")
+        if not texto_noticia.strip():
 
-                        # ==========================
-                        # GAUGE
-                        # ==========================
-                        if tipo == "gauge":
+            st.warning("Debe ingresar una noticia.")
 
-                            fig = go.Figure(go.Indicator(
-                                mode="gauge+number",
-                                value=senal.get("confianza_score", 0.5) * 100,
-                                title={"text": "Confianza IA"},
-                                gauge={
-                                    "axis": {"range": [0, 100]},
-                                    "bar": {"color": "#00b1ff"},
-                                    "steps": [
-                                        {"range": [0, 40], "color": "#8b0000"},
-                                        {"range": [40, 70], "color": "#d4a017"},
-                                        {"range": [70, 100], "color": "#0f9d58"},
-                                    ]
-                                }
-                            ))
+        else:
 
-                            fig.update_layout(
-                                template="plotly_dark",
-                                height=320
-                            )
+            with st.spinner("🤖 Gemini analizando la noticia..."):
 
-                            st.plotly_chart(fig, use_container_width=True)
+                try:
 
-                        # ==========================
-                        # PIE
-                        # ==========================
-                        elif tipo == "pie":
+                    resultado = motor.procesar_pipeline(texto_noticia)
 
-                            fig = px.pie(
-                                values=[m["score"] for m in agent_metrics],
-                                names=[m["agente"] for m in agent_metrics],
-                                hole=0.45
-                            )
+                    st.session_state.resultado_ia = resultado
 
-                            fig.update_layout(
-                                template="plotly_dark",
-                                height=320
-                            )
+                except Exception as e:
 
-                            st.plotly_chart(fig, use_container_width=True)
+                    st.error(f"Error en análisis IA: {e}")
 
-                        # ==========================
-                        # SCATTER
-                        # ==========================
-                        elif tipo == "scatter":
+    # ==========================================
+    # MOSTRAR RESULTADO
+    # ==========================================
 
-                            fig = px.scatter(
-                                x=[m["score"] for m in agent_metrics],
-                                y=[senal.get("confianza_score",0.5)]*len(agent_metrics),
-                                text=[m["agente"] for m in agent_metrics]
-                            )
+    if st.session_state.resultado_ia:
 
-                            fig.update_layout(
-                                template="plotly_dark",
-                                height=320
-                            )
+        senal = st.session_state.resultado_ia
 
-                            st.plotly_chart(fig, use_container_width=True)
+        sid = "sig_" + senal.get("ticker", "UNKNOWN")
 
-                        # ==========================
-                        # LINE
-                        # ==========================
-                        elif tipo == "line":
+        revisiones_db = obtener_revisiones()
 
-                            fig = px.line(
-                                x=[m["agente"] for m in agent_metrics],
-                                y=[m["score"] for m in agent_metrics],
-                                markers=True
-                            )
+        estado_rev = revisiones_db.get(sid, {}).get(
+            "status", "⏳ Pendiente de Auditoría"
+        )
 
-                            fig.update_layout(
-                                template="plotly_dark",
-                                yaxis_range=[0,1],
-                                height=320
-                            )
+        with st.expander(
+            f"📌 {senal.get('activo','Activo desconocido')} " f"| Estado: {estado_rev}",
+            expanded=True,
+        ):
 
-                            st.plotly_chart(fig, use_container_width=True)
+            col1, col2 = st.columns([3, 2])
 
-                        # ==========================
-                        # BARRAS (por defecto)
-                        # ==========================
-                        else:
+            # ==================================
+            # INFORMACIÓN GENERAL
+            # ==================================
 
-                            cols = st.columns(3)
+            with col1:
 
-                            for col, metric in zip(cols, agent_metrics):
+                st.caption(f"""
+                    **Activo:** {senal.get('activo','N/A')}
 
-                                fig = px.bar(
-                                    x=[metric["agente"]],
-                                    y=[metric["score"]],
-                                    text=[metric["label"]],
-                                    title=metric["agente"]
-                                )
+                    **Ticker:** {senal.get('ticker','N/A')}
 
-                                fig.update_traces(
-                                    marker_color="#00b1ff",
-                                    textposition="outside"
-                                )
+                    **Sector:** {senal.get('sector','N/A')}
 
-                                fig.update_layout(
-                                    yaxis=dict(range=[0,1]),
-                                    template="plotly_dark",
-                                    showlegend=False,
-                                    height=260
-                                )
+                    **Tipo activo:** {senal.get('tipo_activo','N/A')}
 
-                                col.plotly_chart(
-                                    fig,
-                                    use_container_width=True,
-                                    key=f"plotly_{sid}_{metric['agente']}"
-                                )
-                
-                st.markdown("---")
-                # Panel de Revisión Humana - HITL
-                st.markdown(f"**Estado de Auditoría:** `{estado_rev}`")
-                c_a, c_b = st.columns([3, 2])
-                with c_a:
-                    just = st.text_input(f"Justificación obligatoria del analista para {sid}:", key=f"j_{sid}")
-                with c_b:
-                    st.write("Decisión fiduciaria:")
-                    b1, b2, b3 = st.columns(3)
-                    if b1.button("✅ Aprobar", key=f"ok_{sid}"):
-                        if len(just) < 5: st.error("Escribe una justificación.")
-                        else:
-                            guardar_revision(sid, "✅ Aprobada", just)
-                            st.rerun()
-                    if b2.button("⚠️ Escalar", key=f"esc_{sid}"):
-                        guardar_revision(sid, "⚠️ Escalada a Comité", just or "Requiere auditoría de riesgo alto.")
+                    """)
+
+                st.write("### Explicación IA")
+
+                st.write(senal.get("explicacion", "Sin explicación"))
+
+                st.markdown(f"""
+                    **⚡ Acción de investigación:**
+
+                    {senal.get(
+                        "accion_investigacion",
+                        "No definida"
+                    )}
+
+                    """)
+
+                st.caption(senal.get("disclaimer", ""))
+
+            # ==================================
+            # IMPACTO
+            # ==================================
+
+            with col2:
+
+                impacto = senal.get("impacto", "Neutral")
+
+                icono = {
+                    "Positivo": "🟢",
+                    "Negativo": "🔴",
+                    "Neutral": "⚪",
+                    "Incierto": "🟡",
+                }.get(impacto, "⚪")
+
+                st.markdown(f"""
+                    ## {icono}
+
+                    Impacto:
+
+                    **{impacto.upper()}**
+
+                    """)
+
+                st.metric("Confianza IA", f"{round(
+                        senal.get(
+                            'confianza_score',
+                            0
+                        )*100
+                    )}%")
+
+                st.metric("Riesgo", senal.get("riesgo", "N/A"))
+
+                st.metric("Horizonte", senal.get("horizonte", "N/A"))
+
+            st.divider()
+
+            # ==================================
+            # GRÁFICOS DINÁMICOS GEMINI
+            # ==================================
+
+            st.write("## 📊 Métricas de Agentes")
+
+            agent_metrics = get_agent_metrics(senal)
+
+            datos_grafico = senal.get("grafico", {})
+            tipo = senal.get("tipo_grafico", "bar")
+
+            if tipo == "gauge":
+
+                fig = go.Figure(
+                    go.Indicator(
+                        mode="gauge+number",
+                        value=senal.get("confianza_score", 0.5) * 100,
+                        title={"text": "Confianza IA"},
+                        gauge={"axis": {"range": [0, 100]}},
+                    )
+                )
+
+                fig.update_layout(template="plotly_dark", height=320)
+
+                st.plotly_chart(fig, use_container_width=True)
+
+            elif tipo == "pie":
+
+                fig = px.pie(
+                    values=[x["score"] for x in agent_metrics],
+                    names=[x["agente"] for x in agent_metrics],
+                    hole=0.4,
+                )
+
+                fig.update_layout(template="plotly_dark")
+
+                st.plotly_chart(fig, use_container_width=True)
+
+            else:
+
+                fig = px.bar(
+                    x=datos_grafico.get("categorias", []),
+                    y=datos_grafico.get("valores", []),
+                    title=datos_grafico.get("titulo", "Análisis IA"),
+                )
+
+                fig.update_layout(template="plotly_dark", yaxis={"range": [0, 1]})
+
+                st.plotly_chart(fig, use_container_width=True)
+
+            # ==================================================
+            # PANEL DE REVISIÓN HUMANA (HITL)
+            # ==================================================
+
+            st.markdown("---")
+
+            st.markdown(f"""
+                ### 🧑‍💼 Auditoría Humana
+
+                Estado actual:
+
+                `{estado_rev}`
+
+                """)
+
+            justificacion = st.text_input(
+                "Justificación del analista:", key=f"just_{sid}"
+            )
+
+            col_a, col_b, col_c = st.columns(3)
+
+            # APROBAR
+
+            with col_a:
+
+                if st.button("✅ Aprobar", key=f"approve_{sid}"):
+
+                    if len(justificacion.strip()) < 5:
+
+                        st.error("Debe escribir una justificación.")
+
+                    else:
+
+                        guardar_revision(sid, "✅ Aprobada", justificacion)
+
+                        st.success("Señal aprobada correctamente.")
+
                         st.rerun()
-                    if b3.button("🗑️ Descartar", key=f"del_{sid}"):
-                        guardar_revision(sid, "❌ Descartada", just or "Ruido de mercado sin impacto temporal.")
-                        st.rerun()
-                st.markdown("</div>", unsafe_allow_html=True)
+
+            # ESCALAR
+
+            with col_b:
+
+                if st.button("⚠️ Escalar", key=f"scale_{sid}"):
+
+                    guardar_revision(
+                        sid,
+                        "⚠️ Escalada a Comité",
+                        (
+                            justificacion
+                            if justificacion
+                            else "Requiere revisión adicional."
+                        ),
+                    )
+
+                    st.warning("Señal enviada a comité.")
+
+                    st.rerun()
+
+            # DESCARTAR
+
+            with col_c:
+
+                if st.button("🗑️ Descartar", key=f"discard_{sid}"):
+
+                    guardar_revision(
+                        sid,
+                        "❌ Descartada",
+                        justificacion if justificacion else "Señal descartada.",
+                    )
+
+                    st.info("Señal descartada.")
+
+                    st.rerun()
+
+# =====================================================
+# TAB 2
+# BRIEFING EJECUTIVO
+# =====================================================
+
 
 with tab2:
-    st.subheader("📑 Briefing Ejecutivo de Mercado (Agente 4)")
-    st.write("Resumen consolidado exclusivo para comités de inversión. **Solo incluye señales marcadas como Aprobadas por analistas humanos**.")
-    
-    revs = obtener_revisiones()
-    aprobadas = {k: v for k, v in revs.items() if "Aprobada" in v["status"]}
-    
+
+    st.subheader("📑 Briefing Ejecutivo de Mercado")
+
+    st.write("""
+Resumen consolidado generado únicamente
+con señales aprobadas por analistas humanos.
+""")
+
+    revisiones = obtener_revisiones()
+
+    aprobadas = {k: v for k, v in revisiones.items() if "Aprobada" in v["status"]}
+
     if not aprobadas:
-        st.warning("No hay señales aprobadas aún. Ve a la pestaña de Radar, escribe una justificación y aprueba una alerta para generar el briefing.")
+
+        st.warning("""
+No existen señales aprobadas todavía.
+
+Analiza una noticia en la pestaña Radar
+y aprueba una señal.
+""")
+
     else:
+
         for sid, datos in aprobadas.items():
-            st.markdown(f"### 📌 Señal Auditada: `{sid}`")
-            st.markdown(f"**Revisor Fiduciario:** {datos['reviewer']} | **Fecha:** {datos['date'][:16]}")
-            st.success(f"**Justificación de Aprobación:** {datos['justification']}")
+
+            st.markdown(f"""
+                ## 📌 Señal Auditada
+
+                **ID:**
+                `{sid}`
+
+
+                **Estado:**
+
+                {datos["status"]}
+
+
+                **Analista:**
+
+                {datos.get(
+                    "reviewer",
+                    "Sistema"
+                )}
+
+
+                **Fecha:**
+
+                {datos.get(
+                    "date",
+                    ""
+                )}
+
+
+                """)
+
+            st.success(f"""
+                Justificación:
+
+                {datos["justification"]}
+                """)
+
             st.divider()
-        if st.button("🖨️ Exportar Briefing para Clientes"):
+
+        if st.button("🖨️ Exportar Briefing"):
+
             st.balloons()
-            st.success("Briefing empaquetado y listo para envío institucional sin directrices de compra/venta.")
+
+            st.success("""
+Briefing generado correctamente.
+
+Documento listo para distribución institucional.
+""")
