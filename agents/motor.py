@@ -13,8 +13,6 @@ class MotorAgentesIA:
             try:
                 genai.configure(api_key=self.api_key)
                 
-                # --- SELECTOR BLINDADO CON PING DE VALIDACIÓN Y PRIORIDAD GEMINI ---
-                # Priorizamos los nombres estándar más rápidos y estables para finanzas
                 candidatos = [
                     'gemini-1.5-flash',
                     'gemini-1.5-flash-latest',
@@ -38,11 +36,9 @@ class MotorAgentesIA:
                     except Exception:
                         continue
                 
-                # Si los nombres estándar fallan, buscamos en el catálogo dando prioridad absoluta a "gemini"
                 if not self.model:
                     modelos_disponibles = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
                     
-                    # Ordenamos para que los que tienen "gemini" y "flash" queden primeros en la fila, dejando "gemma" al final
                     modelos_ordenados = sorted(modelos_disponibles, key=lambda x: (0 if ('gemini' in x.lower() and 'flash' in x.lower()) else (1 if 'gemini' in x.lower() else 2)))
                     
                     for m_name in modelos_ordenados:
@@ -64,7 +60,7 @@ class MotorAgentesIA:
                 self.model = None
 
     def procesar_pipeline(self, noticia, activo):
-        """Ejecuta el pipeline de los 4 agentes con extracción quirúrgica de JSON mediante Regex."""
+        
         evento_coyuntura = {
             "id": noticia.get("id"),
             "titulo": noticia.get("title"),
@@ -92,8 +88,7 @@ class MotorAgentesIA:
                     )
                 )
                 
-                # --- EXTRACCIÓN QUIRÚRGICA CON REGEX ---
-                # Buscamos exclusivamente el bloque que empieza con { y termina con }, ignorando saludos del LLM
+                
                 match = re.search(r'\{.*\}', resp.text, re.DOTALL)
                 if match:
                     texto_json = match.group(0)

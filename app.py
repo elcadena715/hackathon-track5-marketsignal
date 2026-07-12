@@ -10,7 +10,7 @@ from core.database import init_db, guardar_revision, obtener_revisiones
 init_db()
 if "senales_cache" not in st.session_state: st.session_state.senales_cache = {}
 
-st.set_page_config(page_title="MarketSignal Guardian | Track 5", layout="wide", page_icon="⚡")
+st.set_page_config(page_title="MarketSignal Guardian", layout="wide", page_icon="🏦")
 
 # Estilos CSS - Fin-AI Terminal Dark
 st.markdown("""
@@ -75,8 +75,8 @@ with c_f1:
 with c_f2:
     simbolo_filtro = st.selectbox("2. Filtrar por Activo:", ["Todos"] + [a["symbol"] for a in activos_db])
 with c_f3:
-    if st.button("🔄 Refrescar Pipeline de Datos", use_container_width=True):
-        st.toast("Pipeline sincronizado con el repositorio de activos.", icon="✅")
+    if st.button("🔄 Refrescar Noticias", use_container_width=True):
+        st.toast("Noticias Actualizadas", icon="✅")
         st.session_state.recargar = True
 
 # Obtener Noticias (NewsAPI o Resguardo JSON)
@@ -152,16 +152,16 @@ with tab1:
             with c_b:
                 st.write("Decisión fiduciaria:")
                 b1, b2, b3 = st.columns(3)
-                if b1.button("✅ Aprobar", key=f"ok_{sid}"):
-                    if len(just) < 5: st.error("Escribe una justificación.")
+                if b1.button("✅ Validar Señal", key=f"ok_{sid}"):
+                    if len(just) < 5: st.error("Se requiere justificación detallada para validación.")
                     else:
-                        guardar_revision(sid, "✅ Aprobada", just)
+                        guardar_revision(sid, "✅ Validada", just)
                         st.rerun()
-                if b2.button("⚠️ Escalar", key=f"esc_{sid}"):
-                    guardar_revision(sid, "⚠️ Escalada a Comité", just or "Requiere auditoría de riesgo alto.")
+                if b2.button("⚠️ Escalar a Riesgos", key=f"esc_{sid}"):
+                    guardar_revision(sid, "⚠️ Escalada a Riesgos", just or "Revisión técnica de alta prioridad.")
                     st.rerun()
                 if b3.button("🗑️ Descartar", key=f"del_{sid}"):
-                    guardar_revision(sid, "❌ Descartada", just or "Ruido de mercado sin impacto temporal.")
+                    guardar_revision(sid, "❌ Descartada", just or "Sin relevancia para mercado actual.")
                     st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
 
@@ -180,9 +180,8 @@ with tab2:
             st.markdown(f"**Revisor Fiduciario:** {datos['reviewer']} | **Fecha:** {datos['date'][:16]}")
             st.success(f"**Justificación de Aprobación:** {datos['justification']}")
             st.divider()
-        if  st.button("🖨️ Exportar Briefing para Clientes"):
-            st.balloons()
-            
+        if  st.button("📄 Generar Reporte Institucional"):
+                       
             # Crear PDF en memoria
             pdf = FPDF()
             pdf.add_page()
@@ -207,7 +206,7 @@ with tab2:
             st.download_button(
                 label="📥 Descargar Reporte en PDF",
                 data=pdf_output,
-                file_name="Briefing_Ejecutivo.pdf",
+                file_name="Reporte_Ejecutivo.pdf",
                 mime="application/pdf"
             )
-            st.success("Briefing generado en formato PDF profesional.")
+            st.success("Reporte institucional generado exitosamente.")
