@@ -140,7 +140,7 @@ if api_key_news:
         pass # Si falla internet, se mantiene noticias_resguardo automáticamente
 
 # PESTAÑAS
-tab1, tab2 = st.tabs(["📊 Monitor de Mercado - A1,A2", "📑 Reporte de Compliance - A3"])
+tab1, tab2, tab3 = st.tabs(["📊 Monitor de Mercado - A1,A2", "📊 Briefing de Mercado", "📑 Reporte de Compliance - A3"])
 
 with tab1:
     # --- LÓGICA DE NAVEGACIÓN ---
@@ -235,7 +235,51 @@ with tab1:
             b2.button("⚠️ Escalar", key=f"esc_{sid}")
             b3.button("🗑️ Descartar", key=f"del_{sid}")
 
-with tab2:
+with tab2: 
+    st.subheader("📊 Briefing de Mercado")
+    
+    # 1. Selector de Mercado (estilo dashboard)
+    mercados_disponibles = ["Criptoactivos", "Acciones", "Materias Primas", "Bonos"]
+    mercado_seleccionado = st.selectbox("Seleccione el Mercado para el Briefing:", mercados_disponibles)
+    
+    # 2. Tabla de Simulación (Estilo "All Cryptocurrencies")
+    st.write(f"### Activos principales: {mercado_seleccionado}")
+    
+    # Filtrar activos para la tabla
+    activos_tabla = [a for a in activos_db if a["type"] == mercado_seleccionado]
+    
+    # Preparar datos para visualización (solo columnas clave)
+    if activos_tabla:
+        data_tabla = []
+        for a in activos_tabla:
+            data_tabla.append({
+                "Símbolo": a["symbol"],
+                "Nombre": a["name"],
+                "Precio": a["current_price"],
+                "Cambio 7d (%)": a["price_move_7d"]
+            })
+        st.table(data_tabla)
+    else:
+        st.info("No hay activos principales para este mercado en la base actual.")
+
+    # 3. Noticias contextuales del mercado
+    st.markdown("---")
+    st.write(f"### Noticias recientes de {mercado_seleccionado}")
+    
+    # Filtrar noticias según mercado
+    noticias_contexto = [n for n in noticias_actuales if n.get("market") == mercado_seleccionado]
+    
+    if noticias_contexto:
+        for noti in noticias_contexto:
+            with st.container():
+                st.markdown(f"**{noti['title']}**")
+                st.caption(f"Fuente: {noti['source']['name']} | {noti['publishedAt'][:10]}")
+                st.write(noti.get("description", ""))
+                st.divider()
+    else:
+        st.warning("No hay noticias relevantes para este mercado en este momento.")
+
+with tab3:
     st.subheader("📑 Reporte de Compliance - A4")
     st.write("Resumen consolidado exclusivo para comités de inversión. **Solo incluye señales marcadas como Aprobadas por analistas humanos**.")
     
@@ -250,7 +294,7 @@ with tab2:
             st.markdown(f"**Revisor Fiduciario:** {datos['reviewer']} | **Fecha:** {datos['date'][:16]}")
             st.success(f"**Justificación de Aprobación:** {datos['justification']}")
             st.divider()
-        if  st.button("📄 Generar Reporte Institucional"):
+        if  st.button("📄 Generar Reporte"):
                        
             # Crear PDF en memoria
             pdf = FPDF()
@@ -303,4 +347,4 @@ with tab2:
                 file_name="Reporte_Cumplimiento.pdf",
                 mime="application/pdf"
             )
-            st.success("Reporte institucional generado exitosamente.")
+            st.success("Reporte generado exitosamente.")
