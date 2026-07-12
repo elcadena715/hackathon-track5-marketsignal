@@ -224,17 +224,24 @@ with tab2:
             
             # Título
             pdf.set_font("Arial", 'B', 16)
-            pdf.cell(200, 10, txt="MARKETSIGNAL GUARDIAN - BRIEFING EJECUTIVO", ln=True, align='C')
-            pdf.ln(10) # Salto de línea
-            
-            # Contenido
-            pdf.set_font("Arial", size=12)
+            pdf.cell(200, 10, txt="REPORTE DE CUMPLIMIENTO - MARKETSIGNAL GUARDIAN", ln=True, align='C')
+            pdf.set_font("Arial", size=10)
+            pdf.cell(200, 10, txt=f"Fecha de reporte: {datetime.now().isoformat()}", ln=True, align='R')
+            pdf.ln(10)
+
+            # Iteración de señales auditadas
             for sid, datos in aprobadas.items():
                 pdf.set_font("Arial", 'B', 12)
-                pdf.cell(200, 10, txt=f"Señal: {sid}", ln=True)
-                pdf.set_font("Arial", size=12)
-                pdf.multi_cell(0, 10, txt=f"Justificación: {datos['justification']}\nFecha: {datos['date']}\n")
+                pdf.cell(0, 10, txt=f"SEÑAL: {sid}", ln=True, fill=True) # ID Único
+                pdf.set_font("Arial", size=11)
+                pdf.multi_cell(0, 8, txt=f"Justificación del Analista: {datos['justification']}")
+                pdf.cell(0, 8, txt=f"Revisor: {datos['reviewer']} | Fecha: {datos['date']}", ln=True)
                 pdf.ln(5)
+
+            # Disclaimer Obligatorio (Footer)
+            pdf.set_y(-30)
+            pdf.set_font("Arial", 'I', 8)
+            pdf.multi_cell(0, 5, txt="ADVERTENCIA: Este reporte no constituye asesoría financiera personalizada ni recomienda operaciones. Es una herramienta de priorización de investigación basada en análisis agéntico y supervisión humana.")
             
             # Generar el PDF para el botón de descarga
             pdf_output = pdf.output(dest='S').encode('latin-1')
@@ -242,7 +249,7 @@ with tab2:
             st.download_button(
                 label="📥 Descargar Reporte en PDF",
                 data=pdf_output,
-                file_name="Reporte_Ejecutivo.pdf",
+                file_name="Reporte_Cumplimiento.pdf",
                 mime="application/pdf"
             )
             st.success("Reporte institucional generado exitosamente.")
