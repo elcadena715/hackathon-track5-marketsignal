@@ -167,8 +167,18 @@ with tab1:
                         else:
                             guardar_revision(sid, "✅ Validada", justificacion)
                             st.rerun()
-                    b2.button("⚠️ Escalar", key=f"esc_{sid}")
-                    b3.button("🗑️ Descartar", key=f"del_{sid}")
+                    if b2.button("⚠️ Escalar", key=f"ok_{sid}"):
+                        if len(justificacion) < 5:
+                            st.error("Se requiere justificación.")
+                        else:
+                            guardar_revision(sid, "⚠️ Escalar a Riesgos", justificacion)
+                            st.rerun()
+                    if b3.button("🗑️ Descartar", key=f"ok_{sid}"):
+                        if len(justificacion) < 5:
+                            st.error("Se requiere justificación.")
+                        else:
+                            guardar_revision(sid, "❌ Descartada", justificacion)
+                            st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
 
 with tab2:
