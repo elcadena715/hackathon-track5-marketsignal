@@ -188,7 +188,7 @@ with tab1:
         noti, activo_rel, sid = st.session_state.selected_news
         
         if st.button("⬅️ Volver al Radar"):
-        st.session_state.view = 'list'
+           st.session_state.view = 'list'
             
         # PROCESAMIENTO CON MOTOR
         if sid not in st.session_state.senales_cache:
