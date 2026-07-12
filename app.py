@@ -284,6 +284,18 @@ with tab2:
 
 with tab3:
     st.subheader("📑 Reporte de Compliance")
+
+    revs = obtener_revisiones() # Diccionario: {sid: {"status": "...", "justification": "..."}}
+    
+    # Mostrar resumen por estado
+    st.write("### Estado General de Auditoría")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Validadas", len([s for s in revs.values() if "Validada" in s['status']]))
+    col2.metric("Escaladas", len([s for s in revs.values() if "Escalada" in s['status']]))
+    col3.metric("Descartadas", len([s for s in revs.values() if "Descartada" in s['status']]))
+    
+    st.divider()
+    
     st.write("Resumen consolidado exclusivo para comités de inversión. **Solo incluye señales marcadas como Aprobadas por analistas humanos**.")
     
     revs = obtener_revisiones()
