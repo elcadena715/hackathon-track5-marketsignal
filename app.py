@@ -182,7 +182,7 @@ with tab1:
                         st.session_state.selected_news = (noti, activo_rel, sid)
                         st.session_state.view = 'detail'
                         st.rerun()
-                        return
+                    return
 
     # --- FICHA DE AUDITORÍA (DETALLE) ---
     elif st.session_state.view == 'detail':
@@ -191,7 +191,7 @@ with tab1:
         if st.button("⬅️ Volver al Radar"):
             st.session_state.view = 'list'
             st.rerun()
-            return
+        return
             
         # PROCESAMIENTO CON MOTOR
         if sid not in st.session_state.senales_cache:
