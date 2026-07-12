@@ -188,8 +188,7 @@ with tab1:
         noti, activo_rel, sid = st.session_state.selected_news
         
         if st.button("⬅️ Volver al Radar"):
-            st.session_state.view = 'list'
-            st.rerun()
+        st.session_state.view = 'list'
             
         # PROCESAMIENTO CON MOTOR
         if sid not in st.session_state.senales_cache:
@@ -295,7 +294,7 @@ with tab3:
     col3.metric("Descartadas", len([s for s in revs.values() if "Descartada" in s['status']]))
     
     st.divider()
-    
+
     st.write("Resumen consolidado exclusivo para comités de inversión. **Solo incluye señales marcadas como Aprobadas por analistas humanos**.")
     
     revs = obtener_revisiones()
