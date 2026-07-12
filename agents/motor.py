@@ -80,6 +80,7 @@ class MotorAgentesIA:
 
                 Genera la señal explicable en formato estrictamente JSON sin texto introductorio ni markdown.
                 """
+                print("Intentando generar contenido con Gemini...")
                 resp = self.model.generate_content(
                     f"{SYSTEM_PROMPT_ASESOR}\n\n{prompt_usuario}",
                     generation_config=genai.GenerationConfig(
@@ -98,6 +99,7 @@ class MotorAgentesIA:
                     raise ValueError("El modelo no retornó una estructura JSON delimitada por llaves.")
                     
             except Exception as e:
+                print(f"❌ ERROR REAL DE LA API: {e}")
                 print(f"⚠️ Alerta en inferencia ({e}). Pasando al respaldo determinista 9.2.")
                 senal = self._aplicar_formula_matematica(evento_coyuntura, activo)
         else:
