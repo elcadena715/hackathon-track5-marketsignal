@@ -271,6 +271,7 @@ with tab2:
     st.markdown("---")
     st.write(f"### Noticias recientes de {mercado_seleccionado}")
     st.write("") 
+    st.write("") 
     
     noticias_contexto = [n for n in noticias_actuales if n.get("market") == mercado_seleccionado]
     revisiones_tab2 = obtener_revisiones()
