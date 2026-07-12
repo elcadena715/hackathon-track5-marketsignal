@@ -276,8 +276,7 @@ with tab2:
                 if st.button("Leer Análisis IA", key=f"link_{noti['id']}"):
                     st.session_state.selected_news = (noti, next((a for a in activos_db if a["symbol"] in str(noti.get("related_assets"))), activos_db[0]), f"sig_{noti['id']}")
                     st.session_state.view = 'detail'
-                    st.toast("✅ Noticia cargada. Por favor, ve a la pestaña **'Monitor de Mercado'** para ver el análisis.")
-                    st.rerun()
+                    st.switch_page("app.py")
 
 with tab3:
     st.subheader("📑 Reporte de Compliance - A4")
