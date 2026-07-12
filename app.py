@@ -227,22 +227,39 @@ with tab2:
             pdf.set_font("Arial", 'B', 16)
             pdf.cell(200, 10, txt="REPORTE DE CUMPLIMIENTO - MARKETSIGNAL GUARDIAN", ln=True, align='C')
             pdf.set_font("Arial", size=10)
-            pdf.cell(200, 10, txt=f"Fecha de reporte: {datetime.now().isoformat()}", ln=True, align='R')
-            pdf.ln(10)
+            pdf.set_text_color(0, 0, 0)
+            pdf.ln(15)
+            pdf.set_font("Arial", '', 10)
+            pdf.cell(0, 10, f"Fecha de generación: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True, align='R')
+            pdf.ln(5)
 
-            # Iteración de señales auditadas
+            # Cuerpo (Iteración mejorada)
             for sid, datos in aprobadas.items():
+                # Título de la sección de señal
+                pdf.set_fill_color(240, 240, 240)
                 pdf.set_font("Arial", 'B', 12)
-                pdf.cell(0, 10, txt=f"SEÑAL: {sid}", ln=True, fill=True) # ID Único
-                pdf.set_font("Arial", size=11)
-                pdf.multi_cell(0, 8, txt=f"Justificación del Analista: {datos['justification']}")
-                pdf.cell(0, 8, txt=f"Revisor: {datos['reviewer']} | Fecha: {datos['date']}", ln=True)
+                pdf.cell(0, 10, f"  SEÑAL: {sid}", ln=True, fill=True)
+                
+                # Detalles en formato limpio
+                pdf.set_font("Arial", '', 11)
+                pdf.ln(2)
+                pdf.cell(0, 8, f"Analista: {datos.get('reviewer', 'Analista de Turno')}", ln=True)
+                pdf.cell(0, 8, f"Fecha de auditoría: {datos.get('date', '')[:16]}", ln=True)
+                pdf.ln(2)
+                
+                # Justificación (con caja de texto)
+                pdf.set_font("Arial", 'B', 10)
+                pdf.cell(0, 7, "Justificación técnica:", ln=True)
+                pdf.set_font("Arial", '', 10)
+                pdf.multi_cell(0, 6, datos.get('justification', 'N/A'))
+                pdf.ln(10)
+                pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Línea divisoria entre señales
                 pdf.ln(5)
 
-            # Disclaimer Obligatorio (Footer)
-            pdf.set_y(-30)
-            pdf.set_font("Arial", 'I', 8)
-            pdf.multi_cell(0, 5, txt="ADVERTENCIA: Este reporte no constituye asesoría financiera personalizada ni recomienda operaciones. Es una herramienta de priorización de investigación basada en análisis agéntico y supervisión humana.")
+                # Footer (Legal)
+                pdf.set_y(-40)
+                pdf.set_font("Arial", 'I', 8)
+                pdf.multi_cell(0, 4, "ADVERTENCIA LEGAL: Este documento es una herramienta de priorización de investigación basada en análisis agéntico y supervisión humana. No constituye asesoría financiera personalizada ni garantiza rentabilidad. Uso exclusivo para comités internos.")
             
             # Generar el PDF para el botón de descarga
             pdf_output = pdf.output(dest='S').encode('latin-1')
