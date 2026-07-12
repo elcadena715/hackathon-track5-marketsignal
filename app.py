@@ -67,7 +67,7 @@ def cargar_catalogos():
 activos_db, noticias_resguardo = cargar_catalogos()
 
 # --- BARRA LATERAL (CONECTORES Y TICKERS) ---
-st.sidebar.title("⚡ MarketSignal Guardian")
+st.sidebar.title("🏦 MarketSignal Guardian")
 st.sidebar.caption("Hackathon Agentic Scale - Track 5")
 st.sidebar.markdown("---")
 
@@ -153,8 +153,8 @@ with tab1:
                     break
         
         # 2. Filtros (Si no coinciden, saltamos esta noticia)
-            if cat_filtro != "Todos" and activo_rel["type"] != cat_filtro: continue
-            if simbolo_filtro != "Todos" and activo_rel["symbol"] != simbolo_filtro: continue
+            #if cat_filtro != "Todos" and activo_rel["type"] != cat_filtro: continue
+            #if simbolo_filtro != "Todos" and activo_rel["symbol"] != simbolo_filtro: continue
 
             sid = f"sig_{activo_rel['symbol']}_{i}"
             
@@ -199,7 +199,8 @@ with tab1:
         # --- AQUÍ ESTÁ LO QUE FALTABA: IMPACTO Y CONFIANZA ---
         imp = senal["impacto"]
         color = "🟢" if imp == "Positivo" else ("🔴" if imp == "Negativo" else ("⚪" if imp == "Neutral" else "🟡"))
-        
+        st.caption(f"Confianza IA: **{senal['confianza']}** ({senal.get('confianza_score', 'N/A')})")
+
         c_head1, c_head2 = st.columns([2, 1])
         with c_head1:
             st.caption(f"{noti.get('source', {}).get('name', 'N/A')} - {noti.get('publishedAt', '')[:10]}")
@@ -207,7 +208,7 @@ with tab1:
             st.markdown(f"### {color} **{imp.upper()}**")
         
         st.write(noti.get("description", "Sin descripción detallada."))
-        st.caption(f"Confianza IA: **{senal['confianza']}** ({senal.get('confianza_score', 'N/A')})")
+        
         
         st.markdown("---")
         
@@ -218,7 +219,7 @@ with tab1:
         st.caption(f"⚠️ *{senal['disclaimer']}*")
         
         # Flujo de Auditoría
-        with st.expander("📝 Crear Auditoría", expanded=True):
+        with st.expander("📝 Crear Auditoría", expanded=False):
             justificacion = st.text_area("Justificación técnica:", key=f"just_{sid}")
             b1, b2, b3 = st.columns(3)
             if b1.button("✅ Validar", key=f"ok_{sid}"):
