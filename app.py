@@ -77,12 +77,10 @@ with c_cat:
 with c_act:
     simbolo_filtro = st.selectbox("2. Activo:", ["Todos"] + [a["symbol"] for a in activos_db])
 
-with c_ref:
-    # Espaciador para alinear visualmente el botón con la parte inferior de los selectbox
-    
+with c_ref: 
     st.write("") 
-    if st.button("🔄 Sincronizar", use_container_width=True):
-        st.toast("Pipeline sincronizado.", icon="✅")
+    if st.button("🔄 Actualizar Noticias", use_container_width=True):
+        st.toast("Noticias Actualizadas.", icon="✅")
         st.session_state.recargar = True
 
 # Obtener Noticias (NewsAPI o Resguardo JSON)
