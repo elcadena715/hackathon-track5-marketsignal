@@ -16,32 +16,35 @@ st.set_page_config(page_title="MarketSignal Guardian", layout="wide", page_icon=
 # Estilos CSS - Fin-AI Terminal Dark
 st.markdown("""
 <style>
-    /* Fondo claro corporativo */
-    .stApp { background-color: #ffffff; color: #000000; }
-    
-    /* Tarjetas con borde sutil */
-    .signal-card { 
-        background-color: #f8f9fa; 
-        padding: 18px; 
-        border-radius: 8px; 
-        border: 1px solid #dee2e6; 
-        margin-bottom: 12px; 
-    }
-    
-    /* Ajuste de texto para modo claro */
-    h1, h2, h3, h4, p { color: #212529 !important; }
-    
-    /* Estilo de tabs tipo botón (Ahora en gris claro) */
-    div[data-testid="stTabs"] button {
-        background-color: #e9ecef;
-        border: 1px solid #ced4da;
-        color: #495057;
-    }
-    div[data-testid="stTabs"] button[aria-selected="true"] {
-        background-color: #28a745 !important;
-        color: white !important;
-    }
-    </style>
+
+div[data-testid="stTabs"] button {
+    background-color: #161b22; /* Fondo oscuro */
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    padding: 12px 24px;
+    border-radius: 6px; 
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+div[data-testid="stTabs"] button[aria-selected="true"] {
+    background-color: #28a745 !important; 
+    color: white !important;
+    border: 1px solid #28a745 !important;
+    font-weight: bold;
+}
+
+/* 3. Hover 
+div[data-testid="stTabs"] button:hover {
+    border: 1px solid #28a745;
+    color: #28a745;
+}
+
+div[data-testid="stTabs"] [data-baseweb="tab-list"] {
+    border-bottom: none;
+    gap: 10px;
+}
+</style>
 """, unsafe_allow_html=True)
 
 # Cargar Datos Estáticos de Respaldo
