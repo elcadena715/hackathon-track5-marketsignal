@@ -17,7 +17,7 @@ if 'selected_news' not in st.session_state:
 
 st.set_page_config(page_title="MarketSignal Guardian", layout="wide", page_icon="🏦")
 
-# Estilos CSS - Fin-AI Terminal Dark
+
 st.markdown("""
 <style>
 
@@ -89,7 +89,7 @@ def obtener_motor(api_key):
 
 motor = obtener_motor(api_key_gemini)
 
-# 4. Indicador visual limpio para el jurado (Sin mostrar contraseñas)
+# 4. Indicador visual 
 if motor.model:
     st.sidebar.success("🟢 Cerebro IA: Gemini 1.5 Flash Activo")
 elif motor.simulation:
@@ -161,12 +161,12 @@ with tab1:
 
             sid = f"sig_{activo_rel['symbol']}_{i}"
             
-            # 3. Procesar impacto (Caché inteligente)
+            # 3. Procesar impacto 
             if sid not in st.session_state.senales_cache:
                 st.session_state.senales_cache[sid] = motor.procesar_pipeline(noti, activo_rel)
             senal = st.session_state.senales_cache[sid]
 
-            # 4. Renderizado estilo Bloomberg (con Impacto incluido)
+            # 4. Renderizado estilo Bloomberg 
             with st.container(border=True):
                 st.markdown(f"#### {noti.get('title')}")
                 
@@ -200,7 +200,7 @@ with tab1:
         # RENDERIZADO DE FICHA COMPLETA
         st.title(noti.get('title'))
         
-        # --- AQUÍ ESTÁ LO QUE FALTABA: IMPACTO Y CONFIANZA ---
+        
         imp = senal["impacto"]
         color = "🟢" if imp == "Positivo" else ("🔴" if imp == "Negativo" else ("⚪" if imp == "Neutral" else "🟡"))
         st.caption(f"Confianza IA: **{senal['confianza']}** ({senal.get('confianza_score', 'N/A')})")
@@ -216,7 +216,7 @@ with tab1:
         
         st.markdown("---")
         
-        # Explicabilidad COMPLETA
+        
         st.subheader("🔍 Explicabilidad y Acción Recomendada")
         st.info(f"**Explicación:** {senal['explicacion']}")
         st.write(f"**⚡ Acción:** {senal['accion_investigacion']}")
@@ -243,17 +243,17 @@ with tab1:
 with tab2: 
     st.subheader("📊 Briefing de Mercado")
     
-    # 1. Selector de Mercado (estilo dashboard)
+    # 1. Selector de Mercado 
     mercados_disponibles = ["Criptoactivos", "Acciones", "Materias Primas", "Bonos"]
     mercado_seleccionado = st.selectbox("Seleccione el Mercado para el Briefing:", mercados_disponibles)
     
-    # 2. Tabla de Simulación (Estilo "All Cryptocurrencies")
+    # 2. Tabla de Simulación 
     st.write(f"### Activos principales")
     
     # Filtrar activos para la tabla
     activos_tabla = [a for a in activos_db if a["type"] == mercado_seleccionado]
     
-    # Preparar datos para visualización (solo columnas clave)
+    # Preparar datos para visualización 
     if activos_tabla:
         data_tabla = []
         for a in activos_tabla:
@@ -317,7 +317,7 @@ with tab2:
 with tab3:
     st.subheader("📑 Reporte de Compliance")
 
-    revs = obtener_revisiones() # Diccionario: {sid: {"status": "...", "justification": "..."}}
+    revs = obtener_revisiones() 
     
     # Mostrar resumen por estado
     st.write("### Estado General de Auditoría")
@@ -357,7 +357,7 @@ with tab3:
             pdf.cell(0, 10, f"Fecha de generación: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True, align='R')
             pdf.ln(5)
 
-            # Cuerpo (Iteración mejorada)
+            # Cuerpo 
             for sid, datos in aprobadas.items():
                 # Título de la sección de señal
                 pdf.set_fill_color(240, 240, 240)
